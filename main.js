@@ -3,16 +3,13 @@ const publicIp = require('public-ip');
 const Store = require("jfs");
 const jsonDb = new Store(path.join(__dirname, "/userData"));
 const bodyParser = require('body-parser');
-const io = require("socket.io")(conf.socketPort);
 const express = require('express');
 const appServer = express();
 const server = require('http').Server(appServer);
+const io = require("socket.io")(server);
 let myIp;
 
 jsonDb.get('config', function(error, conf) {
-
-    io.serveClient(false);
-    io.attach(server);
     const OBSWebSocket = require('obs-websocket-js');
     const obs = new OBSWebSocket();
     let obsConnect = false;
