@@ -8,28 +8,30 @@
     <script src="/js/jquery.js"></script>
     <script src="/js/socket.io.js"></script>
     <script>
-        var socket = io.connect('http://83.40.166.75:8080');
+        $.getJSON("/api/config.json", function(config) {
+            var socket = io.connect('https://' + config.domain);
 
-        socket.on('editedInfo', function(data) {
-            let season = data.info.temporada;
-            let episode = data.info.capitulo;
-            let title = data.info.titulo;
-            let hashtag = data.info.hashtag;
+            socket.on('editedInfo', function(data) {
+                let season = data.info.temporada;
+                let episode = data.info.capitulo;
+                let title = data.info.titulo;
+                let hashtag = data.info.hashtag;
 
-            $(".episode").html(season + "x" + (episode < 10 ? "0" + episode : episode));
-            $(".nombre").html(title);
-            $(".outline, .normal").html(hashtag)
-        });
+                $(".episode").html(season + "x" + (episode < 10 ? "0" + episode : episode));
+                $(".nombre").html(title);
+                $(".outline, .normal").html(hashtag)
+            });
 
-        $.getJSON("/api/info.json", function(info) {
-            let episode = info.capitulo < 10 ? "0" + info.capitulo : info.capitulo;
-            $(".episode").html(info.temporada + "x" + episode);
-            $(".nombre").html(info.titulo);
-            $(".outline, .normal").html(info.hashtag)
-        })
+            $.getJSON("/api/info.json", function(info) {
+                let episode = info.capitulo < 10 ? "0" + info.capitulo : info.capitulo;
+                $(".episode").html(info.temporada + "x" + episode);
+                $(".nombre").html(info.titulo);
+                $(".outline, .normal").html(info.hashtag)
+            })
 
-        socket.on('editCam', function(data) {
+            socket.on('editCam', function(data) {
 
+            });
         });
     </script>
 </head>

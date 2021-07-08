@@ -11,43 +11,45 @@
     <script src="/js/socket.io.js"></script>
 
     <script>
-        var socket = io.connect('http://83.40.166.75:8080');
+        $.getJSON("/api/config.json", function(config) {
+            var socket = io.connect('https://' + config.domain);
 
-        socket.on('updateScenes', function(data) {
-            $(".scene").removeClass("active");
-            $(".scene[data-id='" + data.data.sceneName + "']").addClass("active");
-            /*
-            if (data.prop)
-                $(".cam[data-id='" + data.id + "']").removeClass("inactive");
-            else
-                $(".cam[data-id='" + data.id + "']").addClass("inactive");*/
-        });
-
-        fetch("http://83.40.166.75:9990/request/obs/getScenes/").
-        then(response => response.json())
-            .then(data => {
-                console.log(data)
-                for (let [sceneKey, scene] of Object.entries(data.data.scenes)) {
-                    let active = "";
-                    if (data.data.currentScene === scene.name)
-                        active = "active"
-                    $(".scenes").append(`<div data-id="${scene.name}" class='scene ${active}' >${scene.name}</div> `)
-
-                }
-            })
-
-
-
-
-
-        $(document).ready(function() {
-            $('body').on('click', '.scene', function(e, elem) {
-                e.preventDefault();
-                let id = $(this).data("id");
-                fetch("http://83.40.166.75:9990/request/obs/switchScene/" + id);
+            socket.on('updateScenes', function(data) {
+                $(".scene").removeClass("active");
+                $(".scene[data-id='" + data.data.sceneName + "']").addClass("active");
+                /*
+                if (data.prop)
+                    $(".cam[data-id='" + data.id + "']").removeClass("inactive");
+                else
+                    $(".cam[data-id='" + data.id + "']").addClass("inactive");*/
             });
 
-        });
+            fetch("https://" + config.domain + "/request/obs/getScenes/").
+            then(response => response.json())
+                .then(data => {
+                    console.log(data)
+                    for (let [sceneKey, scene] of Object.entries(data.data.scenes)) {
+                        let active = "";
+                        if (data.data.currentScene === scene.name)
+                            active = "active"
+                        $(".scenes").append(`<div data-id="${scene.name}" class='scene ${active}' >${scene.name}</div> `)
+
+                    }
+                })
+
+
+
+
+
+            $(document).ready(function() {
+                $('body').on('click', '.scene', function(e, elem) {
+                    e.preventDefault();
+                    let id = $(this).data("id");
+                    fetch("https://" + config.domain + "/request/obs/switchScene/" + id);
+                });
+
+            });
+        })
     </script>
 </head>
 

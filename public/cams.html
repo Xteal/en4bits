@@ -8,8 +8,30 @@
     <script src="/js/jquery.js"></script>
     <script src="/js/socket.io.js"></script>
     <script>
-        var socket = io.connect('http://83.40.166.75:8080');
-        initCams();
+        $.getJSON("/api/config.json", function(config) {
+            var socket = io.connect('https://' + config.domain);
+            initCams();
+
+            socket.on('resetCams', function(data) {
+                console.log("hardRESETAO")
+                initCams();
+            });
+            socket.on('editCam', function(data) {
+                if (!data.prop)
+                    $(".cam[data-id=" + data.id + "]").addClass("inactive");
+                else
+                    $(".cam[data-id=" + data.id + "]").removeClass("inactive");
+
+            });
+
+            socket.on('toggleNames', function(data) {
+                if (!data.prop) {
+                    $(".overlay").addClass("inactive");
+                } else {
+                    $(".overlay").removeClass("inactive");
+                }
+            });
+        })
 
         function initCams() {
             $(".camContainer").html("");
@@ -59,27 +81,6 @@
                 }
             }, 2000);
         }
-
-
-        socket.on('resetCams', function(data) {
-            console.log("hardRESETAO")
-            initCams();
-        });
-        socket.on('editCam', function(data) {
-            if (!data.prop)
-                $(".cam[data-id=" + data.id + "]").addClass("inactive");
-            else
-                $(".cam[data-id=" + data.id + "]").removeClass("inactive");
-
-        });
-
-        socket.on('toggleNames', function(data) {
-            if (!data.prop) {
-                $(".overlay").addClass("inactive");
-            } else {
-                $(".overlay").removeClass("inactive");
-            }
-        });
     </script>
 </head>
 
