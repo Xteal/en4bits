@@ -10,11 +10,11 @@
     <script>
         $.getJSON("/api/config.json", function(config) {
             var socket = io.connect('https://' + config.domain);
-            initCams();
+            initCams(config);
 
             socket.on('resetCams', function(data) {
                 console.log("hardRESETAO")
-                initCams();
+                initCams(config);
             });
             socket.on('editCam', function(data) {
                 if (!data.prop)
@@ -33,7 +33,7 @@
             });
         })
 
-        function initCams() {
+        function initCams(config) {
             $(".camContainer").html("");
             $.getJSON("/api/cams.json", function(cams) {
                 let activeNames = "";
