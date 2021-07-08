@@ -2,53 +2,49 @@ const path = require('path');
 const publicIp = require('public-ip');
 const Store = require("jfs");
 const jsonDb = new Store(path.join(__dirname, "/userData"));
-
+const bodyParser = require('body-parser');
+const io = require("socket.io")(conf.socketPort);
 const express = require('express');
 const appServer = express();
 const server = require('http').Server(appServer);
-const io = require("socket.io")(8080);
-const bodyParser = require('body-parser');
-
-const OBSWebSocket = require('obs-websocket-js');
-const obs = new OBSWebSocket();
-let obsConnect = false;
-
-obs.connect({
-    address: 'localhost:4444',
-    password: '$up3rSecretP@ssw0rd'
-}).then(() => {
-    obsConnect = true;
-}).catch(err => { // Promise convention dicates you have a catch on every chain.
-    console.log(err);
-});
-
-obs.on('SwitchScenes', data => {
-    console.log(`New Active Scene: ${data.sceneName}`);
-});
-
-obs.on('SwitchScenes', data => {
-    io.emit('updateScenes', { data })
-});
-// You must add this handler to avoid uncaught exceptions.
-obs.on('error', err => {
-    console.error('socket error:', err);
-});
-
 let myIp;
-let emotes = "";
 
-jsonDb.get("emotes", function(error, emoticons) {
-    emotes = emoticons;
-    io.emit('botLog', { "author": "BotXteal", "message": "emoticonos cargados!" });
-})
 jsonDb.get('config', function(error, conf) {
+
+    io.serveClient(false);
+    io.attach(server);
+    const OBSWebSocket = require('obs-websocket-js');
+    const obs = new OBSWebSocket();
+    let obsConnect = false;
+
+    obs.connect({
+        address: 'localhost:4444',
+        password: '$up3rSecretP@ssw0rd'
+    }).then(() => {
+        obsConnect = true;
+    }).catch(err => { // Promise convention dicates you have a catch on every chain.
+        console.log(err);
+    });
+
+    obs.on('SwitchScenes', data => {
+        console.log(`New Active Scene: ${data.sceneName}`);
+    });
+
+    obs.on('SwitchScenes', data => {
+        io.emit('updateScenes', { data })
+    });
+    // You must add this handler to avoid uncaught exceptions.
+    obs.on('error', err => {
+        console.error('socket error:', err);
+    });
+
     server.listen(conf.serverPort, function() {
         (async() => {
             myIp = await publicIp.v4();
             conf.ip = myIp;
             jsonDb.save('config', conf, function(error) {
                 if (error) throw error;
-                console.log('Servidor corriendo en http://' + conf.domain + ':' + conf.serverPort);
+                console.log('Servidor corriendo en https://' + conf.domain + ':' + conf.serverPort);
             });
         })();
 

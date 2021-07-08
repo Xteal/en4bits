@@ -14,7 +14,7 @@
 
     <script>
         $.getJSON("/api/config.json", function(config) {
-            var socket = io.connect('https://' + config.domain + ':8080');
+            var socket = io.connect('https://' + config.domain);
             socket.on('editedL3', function(data) {
                 console.log(data.l3.id)
                 let container = $(".l3[data-id='" + data.l3.id + "']");
