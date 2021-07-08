@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Info Edit</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/css/fonts.css" rel="stylesheet">
+    <link href="/css/global.css" rel="stylesheet">
+    <link href="/css/cams.css" rel="stylesheet">
+    <script src="/js/jquery.js"></script>
+    <script src="/js/socket.io.js"></script>
+
+    <script>
+        var socket = io.connect('http://83.40.166.75:8080');
+
+        socket.on('editCam', function(data) {
+            if (data.prop)
+                $(".cam[data-id='" + data.id + "']").removeClass("inactive");
+            else
+                $(".cam[data-id='" + data.id + "']").addClass("inactive");
+        });
+
+        $.getJSON("/api/cams.json", function(cams) {
+            for (let [camKey, cam] of Object.entries(cams.cams)) {
+                let inactive = "";
+                if (!cam.active)
+                    inactive = "inactive";
+                $(".cams").append(`<div data-id="${cam.id}" class='cam ${inactive}' style="background-image:url('/backgrounds/${cam.id}.png')">${cam.id}</div> `)
+
+            }
+        })
+
+
+
+        $(document).ready(function() {
+            $('body').on('click', '.cam', function(e, elem) {
+                e.preventDefault();
+                let id = $(this).data("id");
+                fetch("http://83.40.166.75:9990/request/cam/toggle/" + id);
+            });
+            $('body').on('click', '.hardReset', function(e, elem) {
+                e.preventDefault();
+                fetch("http://83.40.166.75:9990/request/cam/reset/");
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <h3>CAMS</h3>
+        <div class="cams">
+        </div>
+        <input type='button' value="HARD RESET" class="hardReset">
+    </div>
+
+</body>
+
+</html>

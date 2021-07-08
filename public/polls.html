@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Magi Streaming Life & Mana</title>
+    <script src="/js/jquery.js"></script>
+    <script src="/js/socket.io.js"></script>
+    <script>
+        var socket = io.connect('http://83.40.166.75:8080');
+        socket.on('change', function(data) {
+            $(".vida-data").html(data.vida);
+            $(".fill-vida").css("width", (data.vida / data.max_vida) * 100 + "%")
+            $(".max-vida-data").html(data.max_vida);
+
+            $(".mana-data").html(data.mana);
+            $(".fill-mana").css("width", (data.mana / data.max_mana) * 100 + "%")
+            $(".max-mana-data").html(data.max_mana);
+        });
+
+        socket.on('deadCountEvent', function(data) {
+            $(".counter").html(data.count);
+        });
+
+        socket.on('loadDeadCount', function(data) {
+            $(".counter").html(data.count);
+        });
+
+        socket.on("openPoll", function(data) {
+            var values = "";
+            $.each(data.options, function(index, option) {
+                values += "<div class='option' data-index='" + index + "' id='" + option.command + "'><div class='fill'></div><div class='info'>" + option.command + " " + option.name + "</div></div>";
+            })
+            $(".polls").append(`
+				<div class='poll'>
+					<h2>` + data.title + `</h2>
+					<div class='options'>
+							` + values + `	
+						</div>	
+					</div>
+				</div>`);
+        })
+
+        socket.on("vote", function(vote) {
+
+        })
+    </script>
+    <link href="css/skin.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="polls">
+    </div>
+</body>
+
+</html>

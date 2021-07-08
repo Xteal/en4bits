@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>CAMS</title>
+    <link href="/css/fonts.css" rel="stylesheet">
+    <link href="/css/l3.css" rel="stylesheet">
+    <script src="/js/jquery.js"></script>
+    <script src="/js/socket.io.js"></script>
+    <script>
+        var socket = io.connect('http://83.40.166.75:8080');
+
+        socket.on('changeL3', function(data) {
+            console.log(data)
+            if (!data.active) {
+                $(".l3").removeClass("active");
+            } else {
+                $(".title").html(data.l3.title);
+                $(".subtitle").html(data.l3.subtitle);
+                $(".l3").addClass("active");
+            }
+        });
+    </script>
+</head>
+
+<body>
+    <div class="l3">
+        <div class="title"></div>
+        <div class="subtitle"></div>
+    </div>
+</body>
+
+</html>

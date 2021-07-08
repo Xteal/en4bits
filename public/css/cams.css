@@ -1,0 +1,28 @@
+.cams {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.cam {
+    margin: 10px;
+    width: 80px;
+    height: 80px;
+    border-radius: 5px;
+    filter: grayscale(0);
+    box-shadow: 0 0 10px black;
+    background-size: cover;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    text-shadow: 0 0 10px black;
+    color: white;
+    font-size: 30px;
+}
+
+.inactive {
+    filter: grayscale(1);
+    opacity: 0.5;
+}

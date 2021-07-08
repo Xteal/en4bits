@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>L3</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/css/fonts.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" referrerpolicy="no-referrer"
+    />
+    <link href="/css/global.css" rel="stylesheet">
+    <link href="/css/l3Edit.css" rel="stylesheet">
+    <script src="/js/jquery.js"></script>
+    <script src="/js/socket.io.js"></script>
+
+    <script>
+        var socket = io.connect('http://83.40.166.75:8080');
+
+        socket.on('editedL3', function(data) {
+            console.log(data.l3.id)
+            let container = $(".l3[data-id='" + data.l3.id + "']");
+            container.find(".title").val(data.l3.title);
+            container.find(".subtitle").val(data.l3.subtitle);
+            container.find(".preview").html(data.l3.title.substring(0, 55) + "...")
+        });
+
+        socket.on('changeL3', function(data) {
+            let active = data.active;
+            let activeId = data.activeId;
+            changeState(active, activeId)
+        });
+
+        $.getJSON("/api/lower_thirds.json", function(l3) {
+            let active = l3.active;
+            if (active)
+                $(".togglePlay").removeClass("play").addClass("stop").val("STOP")
+            else
+                $(".togglePlay").removeClass("stop").addClass("play").val("PLAY")
+            let activeId = l3.activeId;
+            for (let [l3Key, l3item] of Object.entries(l3.lower_thirds)) {
+                let activeClass = "";
+
+                if (l3item.id == activeId && active)
+                    activeClass = "active";
+                $(".activeId").append(`<option value='${l3item.id}' ${activeId==l3item.id? "selected" : ""}>${l3item.id}</option>`)
+                $(".l3Container").append(`<div class='l3' data-id="${l3item.id}">
+                                            <div class="lineHead">
+                                                <div class='identity ${activeClass}'>${l3item.id}</div><div class='status ${activeClass}'> <div class='dot'></div> <span class='text'>${activeClass!=""? "ACTIVO" : "INACTIVO" }</span></div> <div class="preview">${l3item.title.substring(0,55) + "..."}</div><div class="quickPlay ${activeClass!=""? "stop" : "play" }" data-id="${l3item.id}"><i class="fas ${activeClass!=""? "fa-stop" : "fa-play" }"></i></div>
+                                            </div>
+                                            <form class="form" action='http://83.40.166.75:9990/editL3' method='post'>
+                                                <input type='hidden' name='id' value='${l3item.id}'>
+                                                <input type='text' name='title' class='title' value='${l3item.title}'><br>
+                                                <textarea  name='subtitle' class='subtitle'>${l3item.subtitle}</textarea>
+                                                <input type="submit" value="Guardar">
+                                            </form>
+                                          </div>`)
+
+            }
+        })
+
+
+
+        $(document).ready(function() {
+            $('body').on('click', '.togglePlay', function(e, elem) {
+                let activeId = $(".activeId").val()
+                fetch('http://83.40.166.75:9990/request/l3/toggle/' + activeId)
+            })
+            $('body').on('click', '.quickPlay', function(e, elem) {
+                let activeId = $(this).data("id")
+                fetch('http://83.40.166.75:9990/request/l3/toggle/' + activeId)
+            })
+            $('body').on('click', '.lineHead .identity', function(e, elem) {
+                e.preventDefault();
+                let parent = $(this).parent().parent();
+                let formFind = parent.find('form');
+                if (formFind.hasClass("open"))
+                    formFind.removeClass("open");
+                else
+                    formFind.addClass("open");
+            });
+            $('body').on('submit', '.form', function(e, elem) {
+                e.preventDefault();
+                let data = {
+                    id: $(this).find("input[name='id']").val(),
+                    title: $(this).find("input[name='title']").val(),
+                    subtitle: $(this).find("textarea").val()
+                }
+
+                $(this).parent().find(".preview").html(data.title.substring(0, 15) + "...");
+
+                fetch("http://83.40.166.75:9990/request/l3/edit", {
+                    method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                    mode: 'cors', // no-cors, *cors, same-origin
+                    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                    credentials: 'same-origin', // include, *same-origin, omit
+                    headers: {
+                        'Content-Type': 'application/json'
+                            // 'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    redirect: 'follow', // manual, *follow, error
+                    referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                    body: JSON.stringify(data) // body data type must match "Content-Type" header
+                });
+
+            });
+        });
+
+        function changeState(value, id = "") {
+            console.log(value + " " + id)
+            if (value) {
+                $(".togglePlay").removeClass("play").addClass("stop").val("STOP")
+                $(".quickPlay").removeClass("play stop");
+                if (id != "") {
+                    $(".l3[data-id='" + id + "'] .status,.l3[data-id='" + id + "']  .identity").addClass("active");
+                    $(".l3[data-id='" + id + "'] .status .text").html("ACTIVO")
+                    $(".l3[data-id='" + id + "'] .quickPlay").addClass("stop");
+                }
+
+                $(".quickPlay .fas").removeClass("fa-play").addClass("fa-stop");
+            } else {
+                $(".status, .identity").removeClass("active");
+                $(".status .text").html("INACTIVO")
+                $(".togglePlay").removeClass("stop").addClass("play").val("PLAY")
+                $(".quickPlay").addClass("play").removeClass("stop");
+                $(".quickPlay .fas").addClass("fa-play").removeClass("fa-stop");
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="controls">
+            <div class="select">
+                <select class="activeId">
+                </select>
+                <div class="select_arrow">
+                </div>
+            </div>
+            <input type="button" class="togglePlay" value="PLAY">
+        </div>
+        <div class="l3Container">
+        </div>
+    </div>
+
+</body>
+
+</html>

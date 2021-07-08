@@ -1,0 +1,70 @@
+.container {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.title {
+    position: absolute;
+    left: 50px;
+    top: 50px;
+    width: 400px;
+    height: 100px;
+}
+
+.episode {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #031528;
+    font-family: 'ScoutCond-Black';
+    font-size: 60px;
+    position: absolute;
+    height: 80px;
+    width: 70px;
+    left: 60px;
+    transform-origin: left bottom;
+    transform: rotate(-90deg);
+    bottom: 20px;
+    line-height: .6;
+    box-sizing: border-box;
+    border-bottom: 1px solid #031528;
+}
+
+.nombre {
+    color: white;
+    font-family: 'ScoutCond-Light';
+    font-size: 50px;
+    line-height: .8;
+    left: 80px;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.hashtag {
+    position: absolute;
+    top: 50px;
+    right: 50px;
+    text-align: right;
+    font-family: 'ScoutCond-Black';
+    font-size: 80px;
+}
+
+.outline {
+    position: absolute;
+    right: 0;
+    top: -15px;
+    -webkit-text-stroke: 1px white;
+    color: transparent;
+}
+
+.normal {
+    position: absolute;
+    right: 0;
+    top: 0px;
+    color: white;
+}

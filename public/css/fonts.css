@@ -1,0 +1,59 @@
+@font-face {
+    font-family: 'Scout-Regular';
+    src: url('../fonts/Scout-Regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Scout-Black';
+    src: url('../fonts/Scout-Black.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Scout-Bold';
+    src: url('../fonts/Scout-Bold.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'ScoutCond-Black';
+    src: url('../fonts/ScoutCond-Black.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'ScoutCond-Bold';
+    src: url('../fonts/ScoutCond-Bold.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'ScoutCond-ExtraLight';
+    src: url('../fonts/ScoutCond-ExtraLight.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'ScoutCond-Light';
+    src: url('../fonts/ScoutCond-Light.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'ScoutCond-Regular';
+    src: url('../fonts/ScoutCond-Regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'ScoutCond-Thin';
+    src: url('../fonts/ScoutCond-Thin.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Scout-ExtraLight';
+    src: url('../fonts/Scout-ExtraLight.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Scout-Light';
+    src: url('../fonts/Scout-Light.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Scout-Thin';
+    src: url('./fonts/Scout-Thin.ttf') format('truetype');
+}

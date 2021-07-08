@@ -1,0 +1,56 @@
+.l3 {
+    position: absolute;
+    left: 39px;
+    bottom: 35px;
+    height: 180px;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    transition: all 1s;
+    clip-path: inset(0 100% 0 0);
+    padding: 10px 50px;
+    background: #031528;
+    max-width: 1200px;
+}
+
+.cam {
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+    height: 620px;
+    text-align: center;
+    max-width: 800px;
+    transition: all .5s;
+    background-position: center center;
+    background-size: cover;
+    flex-grow: 1;
+    display: flex;
+    /* NEW, Spec - Firefox, Chrome, Opera */
+    justify-content: center;
+    align-items: center;
+    border: 3px solid #031528;
+    margin: 0 5px;
+}
+
+.active {
+    clip-path: inset(0 0 0 0);
+}
+
+.title {
+    font-family: 'Scout-Black';
+    color: white;
+    font-size: 60px;
+    line-height: 1;
+}
+
+.subtitle {
+    font-family: 'ScoutCond-Light';
+    color: #cc3939;
+    font-size: 50px;
+    line-height: .9;
+}
+
+.subtitle b {
+    font-family: 'ScoutCond-Bold';
+}

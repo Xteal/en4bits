@@ -1,0 +1,35 @@
+{
+    "name": "xteal-streaming-manager",
+    "version": "1.0.0",
+    "description": "Manage Stream for Xteal",
+    "main": "main.js",
+    "scripts": {
+        "start": "node main.js",
+        "package": ""
+    },
+    "repository": "",
+    "keywords": [
+        "en4bits",
+        "en4bits server",
+        "en4bits podcast",
+        "en4bits podcast videojuegs"
+    ],
+    "author": "Kevin Rovira <kevinra8@gmail.com>",
+    "license": "CC0-1.0",
+    "devDependencies": {
+        "asar": "^2.0.1",
+        "electron": "^7.1.2",
+        "electron-packager": "^14.1.0"
+    },
+    "dependencies": {
+        "body-parser": "^1.19.0",
+        "express": "^4.17.1",
+        "jfs": "^0.3.0",
+        "node-static": "^0.7.11",
+        "obs-websocket-js": "^4.0.2",
+        "public-ip": "^4.0.4",
+        "socket.io": "^2.3.0",
+        "socket.io-client": "^2.3.0",
+        "tmi.js": "^1.5.0"
+    }
+}

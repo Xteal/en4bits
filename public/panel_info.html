@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Info Edit</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/css/fonts.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" referrerpolicy="no-referrer"
+    />
+    <link href="/css/global.css" rel="stylesheet">
+    <link href="/css/info.css" rel="stylesheet">
+    <script src="/js/jquery.js"></script>
+    <script src="/js/socket.io.js"></script>
+
+    <script>
+        var socket = io.connect('http://83.40.166.75:8080');
+
+        socket.on('editedInfo', function(data) {
+            let season = data.info.temporada;
+            let episode = data.info.capitulo;
+            let title = data.info.titulo;
+            let hashtag = data.info.hashtag;
+
+            $("input[name='hashtag']").val(hashtag);
+            $("input[name='episode']").val(episode);
+            $("input[name='title']").val(title);
+            $("input[name='season']").val(season);
+        });
+
+        $.getJSON("/api/info.json", function(info) {
+            let season = info.temporada;
+            let episode = info.capitulo;
+            let title = info.titulo;
+            let hashtag = info.hashtag;
+
+            $("input[name='hashtag']").val(hashtag);
+            $("input[name='episode']").val(episode);
+            $("input[name='title']").val(title);
+            $("input[name='season']").val(season);
+        })
+
+
+
+        $(document).ready(function() {
+            $('body').on('submit', '.form', function(e, elem) {
+                e.preventDefault();
+                let data = {
+                    title: $(this).find("input[name='title']").val(),
+                    season: $(this).find("input[name='season']").val(),
+                    episode: $(this).find("input[name='episode']").val(),
+                    hashtag: $(this).find("input[name='hashtag']").val(),
+                }
+                fetch("http://83.40.166.75:9990/request/info/edit", {
+                    method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                    mode: 'cors', // no-cors, *cors, same-origin
+                    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                    credentials: 'same-origin', // include, *same-origin, omit
+                    headers: {
+                        'Content-Type': 'application/json'
+                            // 'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    redirect: 'follow', // manual, *follow, error
+                    referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                    body: JSON.stringify(data) // body data type must match "Content-Type" header
+                });
+
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <h3>INFO</h3>
+        <div class="">
+            <form action="" class="form" method="POST">
+                <div style="display: flex; justify-content: space-between;">
+                    <label style="width: 45%;">
+                        Temporada
+                        <input type="text" name="season">
+                    </label>
+                    <label style="width: 45%;">
+                        Capítulo
+                        <input type="text" name="episode" >
+                    </label>
+                </div>
+
+                <label>
+                    Título
+                    <input type="text" name="title">
+                </label>
+                <label>
+                    Hashtag
+                    <input type="text" name="hashtag">
+                </label>
+                <input type="submit" value="Guardar">
+            </form>
+
+        </div>
+    </div>
+
+</body>
+
+</html>
