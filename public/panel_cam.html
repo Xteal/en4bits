@@ -26,7 +26,7 @@
                     let inactive = "";
                     if (!cam.active)
                         inactive = "inactive";
-                    $(".cams").append(`<div data-id="${cam.id}" class='cam ${inactive}' style="background-image:url('https://${config.domain}/backgrounds/${cam.id}.png')">${cam.id}</div> `)
+                    $(".cams").append(`<div data-id="${cam.id}" class='cam ${inactive}' style="background-image:url('https://${config.domain}/backgrounds/${cam.id.toLowerCase()}.png')">${cam.id}</div> `)
 
                 }
             })
