@@ -45,7 +45,11 @@ jsonDb.get('config', function(error, conf) {
     server.listen(conf.serverPort, function() {
         (async() => {
             myIp = await publicIp.v4();
-            console.log('Servidor corriendo en http:/' + myIp + ':' + conf.serverPort);
+            conf.ip = myIp;
+            jsonDb.save('config', conf, function(error) {
+                if (error) throw error;
+                console.log('Servidor corriendo en http://' + myIp + ':' + conf.serverPort);
+            });
         })();
 
         appServer.use(bodyParser.urlencoded({ extended: true }));

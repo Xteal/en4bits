@@ -1,1 +1,1 @@
-{ "socketPort": "9991", "serverPort": "9990" }
+{ "ip": "", "socketPort": "9991", "serverPort": "9990" }
