@@ -13,49 +13,51 @@
     <script src="/js/socket.io.js"></script>
 
     <script>
-        var socket = io.connect('http://83.40.166.75:8080');
+        $.getJSON("/api/config.json", function(config) {
+            var socket = io.connect('http://' + config.domain + ':8080');
+            socket.on('editedL3', function(data) {
+                console.log(data.l3.id)
+                let container = $(".l3[data-id='" + data.l3.id + "']");
+                container.find(".title").val(data.l3.title);
+                container.find(".subtitle").val(data.l3.subtitle);
+                container.find(".preview").html(data.l3.title.substring(0, 55) + "...")
+            });
 
-        socket.on('editedL3', function(data) {
-            console.log(data.l3.id)
-            let container = $(".l3[data-id='" + data.l3.id + "']");
-            container.find(".title").val(data.l3.title);
-            container.find(".subtitle").val(data.l3.subtitle);
-            container.find(".preview").html(data.l3.title.substring(0, 55) + "...")
+            socket.on('changeL3', function(data) {
+                let active = data.active;
+                let activeId = data.activeId;
+                changeState(active, activeId)
+            });
+
+            $.getJSON("/api/lower_thirds.json", function(l3) {
+                let active = l3.active;
+                if (active)
+                    $(".togglePlay").removeClass("play").addClass("stop").val("STOP")
+                else
+                    $(".togglePlay").removeClass("stop").addClass("play").val("PLAY")
+                let activeId = l3.activeId;
+                for (let [l3Key, l3item] of Object.entries(l3.lower_thirds)) {
+                    let activeClass = "";
+
+                    if (l3item.id == activeId && active)
+                        activeClass = "active";
+                    $(".activeId").append(`<option value='${l3item.id}' ${activeId==l3item.id? "selected" : ""}>${l3item.id}</option>`)
+                    $(".l3Container").append(`<div class='l3' data-id="${l3item.id}">
+                                                <div class="lineHead">
+                                                    <div class='identity ${activeClass}'>${l3item.id}</div><div class='status ${activeClass}'> <div class='dot'></div> <span class='text'>${activeClass!=""? "ACTIVO" : "INACTIVO" }</span></div> <div class="preview">${l3item.title.substring(0,55) + "..."}</div><div class="quickPlay ${activeClass!=""? "stop" : "play" }" data-id="${l3item.id}"><i class="fas ${activeClass!=""? "fa-stop" : "fa-play" }"></i></div>
+                                                </div>
+                                                <form class="form" action='http://83.40.166.75:9990/editL3' method='post'>
+                                                    <input type='hidden' name='id' value='${l3item.id}'>
+                                                    <input type='text' name='title' class='title' value='${l3item.title}'><br>
+                                                    <textarea  name='subtitle' class='subtitle'>${l3item.subtitle}</textarea>
+                                                    <input type="submit" value="Guardar">
+                                                </form>
+                                            </div>`)
+
+                }
+            })
         });
 
-        socket.on('changeL3', function(data) {
-            let active = data.active;
-            let activeId = data.activeId;
-            changeState(active, activeId)
-        });
-
-        $.getJSON("/api/lower_thirds.json", function(l3) {
-            let active = l3.active;
-            if (active)
-                $(".togglePlay").removeClass("play").addClass("stop").val("STOP")
-            else
-                $(".togglePlay").removeClass("stop").addClass("play").val("PLAY")
-            let activeId = l3.activeId;
-            for (let [l3Key, l3item] of Object.entries(l3.lower_thirds)) {
-                let activeClass = "";
-
-                if (l3item.id == activeId && active)
-                    activeClass = "active";
-                $(".activeId").append(`<option value='${l3item.id}' ${activeId==l3item.id? "selected" : ""}>${l3item.id}</option>`)
-                $(".l3Container").append(`<div class='l3' data-id="${l3item.id}">
-                                            <div class="lineHead">
-                                                <div class='identity ${activeClass}'>${l3item.id}</div><div class='status ${activeClass}'> <div class='dot'></div> <span class='text'>${activeClass!=""? "ACTIVO" : "INACTIVO" }</span></div> <div class="preview">${l3item.title.substring(0,55) + "..."}</div><div class="quickPlay ${activeClass!=""? "stop" : "play" }" data-id="${l3item.id}"><i class="fas ${activeClass!=""? "fa-stop" : "fa-play" }"></i></div>
-                                            </div>
-                                            <form class="form" action='http://83.40.166.75:9990/editL3' method='post'>
-                                                <input type='hidden' name='id' value='${l3item.id}'>
-                                                <input type='text' name='title' class='title' value='${l3item.title}'><br>
-                                                <textarea  name='subtitle' class='subtitle'>${l3item.subtitle}</textarea>
-                                                <input type="submit" value="Guardar">
-                                            </form>
-                                          </div>`)
-
-            }
-        })
 
 
 

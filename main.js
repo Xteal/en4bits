@@ -48,7 +48,7 @@ jsonDb.get('config', function(error, conf) {
             conf.ip = myIp;
             jsonDb.save('config', conf, function(error) {
                 if (error) throw error;
-                console.log('Servidor corriendo en http://' + myIp + ':' + conf.serverPort);
+                console.log('Servidor corriendo en http://' + conf.domain + ':' + conf.serverPort);
             });
         })();
 
