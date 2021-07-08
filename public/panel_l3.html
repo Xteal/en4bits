@@ -56,55 +56,57 @@
 
                 }
             })
-        });
 
-
-
-
-        $(document).ready(function() {
-            $('body').on('click', '.togglePlay', function(e, elem) {
-                let activeId = $(".activeId").val()
-                fetch('http://83.40.166.75:9990/request/l3/toggle/' + activeId)
-            })
-            $('body').on('click', '.quickPlay', function(e, elem) {
-                let activeId = $(this).data("id")
-                fetch('http://83.40.166.75:9990/request/l3/toggle/' + activeId)
-            })
-            $('body').on('click', '.lineHead .identity', function(e, elem) {
-                e.preventDefault();
-                let parent = $(this).parent().parent();
-                let formFind = parent.find('form');
-                if (formFind.hasClass("open"))
-                    formFind.removeClass("open");
-                else
-                    formFind.addClass("open");
-            });
-            $('body').on('submit', '.form', function(e, elem) {
-                e.preventDefault();
-                let data = {
-                    id: $(this).find("input[name='id']").val(),
-                    title: $(this).find("input[name='title']").val(),
-                    subtitle: $(this).find("textarea").val()
-                }
-
-                $(this).parent().find(".preview").html(data.title.substring(0, 15) + "...");
-
-                fetch("http://83.40.166.75:9990/request/l3/edit", {
-                    method: 'POST', // *GET, POST, PUT, DELETE, etc.
-                    mode: 'cors', // no-cors, *cors, same-origin
-                    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-                    credentials: 'same-origin', // include, *same-origin, omit
-                    headers: {
-                        'Content-Type': 'application/json'
-                            // 'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    redirect: 'follow', // manual, *follow, error
-                    referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-                    body: JSON.stringify(data) // body data type must match "Content-Type" header
+            $(document).ready(function() {
+                $('body').on('click', '.togglePlay', function(e, elem) {
+                    let activeId = $(".activeId").val()
+                    fetch('https://' + config.domain + '/request/l3/toggle/' + activeId)
+                })
+                $('body').on('click', '.quickPlay', function(e, elem) {
+                    let activeId = $(this).data("id")
+                    fetch('https://' + config.domain + '/request/l3/toggle/' + activeId)
+                })
+                $('body').on('click', '.lineHead .identity', function(e, elem) {
+                    e.preventDefault();
+                    let parent = $(this).parent().parent();
+                    let formFind = parent.find('form');
+                    if (formFind.hasClass("open"))
+                        formFind.removeClass("open");
+                    else
+                        formFind.addClass("open");
                 });
+                $('body').on('submit', '.form', function(e, elem) {
+                    e.preventDefault();
+                    let data = {
+                        id: $(this).find("input[name='id']").val(),
+                        title: $(this).find("input[name='title']").val(),
+                        subtitle: $(this).find("textarea").val()
+                    }
 
+                    $(this).parent().find(".preview").html(data.title.substring(0, 15) + "...");
+
+                    fetch("https://" + config.domain + "/request/l3/edit", {
+                        method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                        mode: 'cors', // no-cors, *cors, same-origin
+                        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                        credentials: 'same-origin', // include, *same-origin, omit
+                        headers: {
+                            'Content-Type': 'application/json'
+                                // 'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        redirect: 'follow', // manual, *follow, error
+                        referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                        body: JSON.stringify(data) // body data type must match "Content-Type" header
+                    });
+
+                });
             });
         });
+
+
+
+
+
 
         function changeState(value, id = "") {
             console.log(value + " " + id)
