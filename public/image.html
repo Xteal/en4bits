@@ -4,21 +4,20 @@
 <head>
     <title>CAMS</title>
     <link href="/css/fonts.css" rel="stylesheet">
-    <link href="/css/l3.css" rel="stylesheet">
+    <link href="/css/image.css" rel="stylesheet">
     <script src="/js/jquery.js"></script>
     <script src="/js/socket.io.js"></script>
     <script>
         $.getJSON("/api/config.json", function(config) {
             var socket = io.connect(config.domain + ":" + config.serverPort);
 
-            socket.on('changeL3', function(data) {
+            socket.on('changeImage', function(data) {
                 console.log(data)
                 if (!data.active) {
-                    $(".l3").removeClass("active");
+                    $(".image").removeClass("active");
                 } else {
-                    $(".title").html(data.l3.title);
-                    $(".subtitle").html(data.l3.subtitle);
-                    $(".l3").addClass("active");
+                    $(".image img").attr("src", data.image.url);
+                    $(".image").addClass("active");
                 }
             });
         });
@@ -26,9 +25,8 @@
 </head>
 
 <body>
-    <div class="l3">
-        <div class="title"></div>
-        <div class="subtitle"></div>
+    <div class="image">
+        <img src="" alt="">
     </div>
 </body>
 

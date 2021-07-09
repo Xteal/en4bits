@@ -8,48 +8,48 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" referrerpolicy="no-referrer"
     />
     <link href="/css/global.css" rel="stylesheet">
-    <link href="/css/l3Edit.css" rel="stylesheet">
+    <link href="/css/imageEdit.css" rel="stylesheet">
     <script src="/js/jquery.js"></script>
     <script src="/js/socket.io.js"></script>
 
     <script>
         $.getJSON("/api/config.json", function(config) {
             var socket = io.connect(config.domain + ":" + config.serverPort);
-            socket.on('editedL3', function(data) {
+            socket.on('editedImage', function(data) {
                 console.log(data.l3.id)
-                let container = $(".l3[data-id='" + data.l3.id + "']");
-                container.find(".title").val(data.l3.title);
-                container.find(".subtitle").val(data.l3.subtitle);
-                container.find(".preview").html(data.l3.title.substring(0, 55) + "...")
+                let container = $(".image[data-id='" + data.image.id + "']");
+                container.find(".title").val(data.image.title);
+                container.find(".url").val(data.iamge.subtitle);
+                container.find(".preview").html(data.image.title.substring(0, 55) + "...")
             });
 
-            socket.on('changeL3', function(data) {
+            socket.on('changeImage', function(data) {
                 let active = data.active;
-                let activeId = data.activeId;
-                changeState(active, activeId)
+                let activeImage = data.activeImage;
+                changeState(active, activeImage)
             });
 
-            $.getJSON("/api/lower_thirds.json", function(l3) {
-                let active = l3.active;
+            $.getJSON("/api/images.json", function(images) {
+                let active = images.active;
                 if (active)
                     $(".togglePlay").removeClass("play").addClass("stop").val("STOP")
                 else
                     $(".togglePlay").removeClass("stop").addClass("play").val("PLAY")
-                let activeId = l3.activeId;
-                for (let [l3Key, l3item] of Object.entries(l3.lower_thirds)) {
+                let activeImage = images.activeImage;
+                for (let [imageKey, imageItem] of Object.entries(images.images)) {
                     let activeClass = "";
 
-                    if (l3item.id == activeId && active)
+                    if (imageItem.id == activeImage && active)
                         activeClass = "active";
-                    $(".activeId").append(`<option value='${l3item.id}' ${activeId==l3item.id? "selected" : ""}>${l3item.id}</option>`)
-                    $(".l3Container").append(`<div class='l3' data-id="${l3item.id}">
+                    $(".activeId").append(`<option value='${imageItem.id}' ${activeImage==imageItem.id? "selected" : ""}>${imageItem.id}</option>`)
+                    $(".l3Container").append(`<div class='l3' data-id="${imageItem.id}">
                                                 <div class="lineHead">
-                                                    <div class='identity ${activeClass}'>${l3item.id}</div><div class='status ${activeClass}'> <div class='dot'></div> <span class='text'>${activeClass!=""? "ACTIVO" : "INACTIVO" }</span></div> <div class="preview">${l3item.title.substring(0,55) + "..."}</div><div class="quickPlay ${activeClass!=""? "stop" : "play" }" data-id="${l3item.id}"><i class="fas ${activeClass!=""? "fa-stop" : "fa-play" }"></i></div>
+                                                    <div class='identity ${activeClass}'>${imageItem.id}</div><div class='status ${activeClass}'> <div class='dot'></div> <span class='text'>${activeClass!=""? "ACTIVO" : "INACTIVO" }</span></div> <div class="preview">${imageItem.title.substring(0,55) + "..."}</div><div class="quickPlay ${activeClass!=""? "stop" : "play" }" data-id="${imageItem.id}"><i class="fas ${activeClass!=""? "fa-stop" : "fa-play" }"></i></div>
                                                 </div>
-                                                <form class="form" action='${config.domain + ":" +config.serverPort}/editL3' method='post'>
-                                                    <input type='hidden' name='id' value='${l3item.id}'>
-                                                    <input type='text' name='title' class='title' value='${l3item.title}'><br>
-                                                    <textarea  name='subtitle' class='subtitle'>${l3item.subtitle}</textarea>
+                                                <form class="form" action='${config.domain + ":" +config.serverPort}/editImage' method='post'>
+                                                    <input type='hidden' name='id' value='${imageItem.id}'>
+                                                    <input type='text' name='title' class='title' value='${imageItem.title}' placeholder="Título"><br>
+                                                    <input type='text' name='url' class='url' value='${imageItem.url}' placeholder="URL"><br>
                                                     <input type="submit" value="Guardar">
                                                 </form>
                                             </div>`)
@@ -60,11 +60,11 @@
             $(document).ready(function() {
                 $('body').on('click', '.togglePlay', function(e, elem) {
                     let activeId = $(".activeId").val()
-                    fetch(config.domain + ":" + config.serverPort + '/request/l3/toggle/' + activeId)
+                    fetch(config.domain + ":" + config.serverPort + '/request/image/toggle/' + activeId)
                 })
                 $('body').on('click', '.quickPlay', function(e, elem) {
                     let activeId = $(this).data("id")
-                    fetch(config.domain + ":" + config.serverPort + '/request/l3/toggle/' + activeId)
+                    fetch(config.domain + ":" + config.serverPort + '/request/image/toggle/' + activeId)
                 })
                 $('body').on('click', '.lineHead .identity', function(e, elem) {
                     e.preventDefault();
@@ -80,12 +80,12 @@
                     let data = {
                         id: $(this).find("input[name='id']").val(),
                         title: $(this).find("input[name='title']").val(),
-                        subtitle: $(this).find("textarea").val()
+                        url: $(this).find("input[name='url']").val()
                     }
 
                     $(this).parent().find(".preview").html(data.title.substring(0, 15) + "...");
 
-                    fetch(config.domain + ":" + config.serverPort + "/request/l3/edit", {
+                    fetch(config.domain + ":" + config.serverPort + "/request/image/edit", {
                         method: 'POST', // *GET, POST, PUT, DELETE, etc.
                         mode: 'cors', // no-cors, *cors, same-origin
                         cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached

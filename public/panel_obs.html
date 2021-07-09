@@ -12,7 +12,7 @@
 
     <script>
         $.getJSON("/api/config.json", function(config) {
-            var socket = io.connect(config.domain);
+            var socket = io.connect(config.domain + ":" + config.serverPort);
 
             socket.on('updateScenes', function(data) {
                 $(".scene").removeClass("active");
@@ -24,7 +24,7 @@
                     $(".cam[data-id='" + data.id + "']").addClass("inactive");*/
             });
 
-            fetch(config.domain + "/request/obs/getScenes/").
+            fetch(config.domain + ":" + config.serverPort + "/request/obs/getScenes/").
             then(response => response.json())
                 .then(data => {
                     console.log(data)
@@ -45,7 +45,7 @@
                 $('body').on('click', '.scene', function(e, elem) {
                     e.preventDefault();
                     let id = $(this).data("id");
-                    fetch(config.domain + "/request/obs/switchScene/" + id);
+                    fetch(config.domain + ":" + config.serverPort + "/request/obs/switchScene/" + id);
                 });
 
             });

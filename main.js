@@ -41,7 +41,7 @@ jsonDb.get('config', function(error, conf) {
             conf.ip = myIp;
             jsonDb.save('config', conf, function(error) {
                 if (error) throw error;
-                console.log('Servidor corriendo en https://' + conf.domain + ':' + conf.serverPort);
+                console.log('Servidor corriendo en ' + conf.domain + ':' + conf.serverPort);
             });
         })();
 
@@ -69,6 +69,10 @@ jsonDb.get('config', function(error, conf) {
             res.sendFile(__dirname + '/public/overlay.html');
         })
 
+        appServer.get('/image', (req, res) => {
+            res.sendFile(__dirname + '/public/image.html');
+        })
+
         /* BACK END VIEWS */
         appServer.get('/panel/info', (req, res) => {
             res.sendFile(__dirname + '/public/panel_info.html');
@@ -76,6 +80,10 @@ jsonDb.get('config', function(error, conf) {
 
         appServer.get('/panel/l3', (req, res) => {
             res.sendFile(__dirname + '/public/panel_l3.html');
+        })
+
+        appServer.get('/panel/image', (req, res) => {
+            res.sendFile(__dirname + '/public/panel_image.html');
         })
 
         appServer.get('/panel/cam', (req, res) => {
@@ -99,8 +107,12 @@ jsonDb.get('config', function(error, conf) {
         appServer.get('/request/obs/switchScene/:id', switchScene);
 
         /* L3 REQUESTS */
-        appServer.get('/request/l3/toggle/:id?', tooggleL3)
+        appServer.get('/request/l3/toggle/:id?', tooggleL3);
         appServer.post('/request/l3/edit', editL3);
+
+        /* IMAGE REQUESTS */
+        appServer.get('/request/image/toggle/:id?', tooggleImage);
+        appServer.post('/request/image/edit', editImage);
 
         /* INFO REQUESTS */
         appServer.post('/request/info/edit', editInfo)
@@ -211,6 +223,58 @@ function editL3(req, res) {
     })
 }
 
+function tooggleImage(req, res) {
+    let id = req.params.id;
+    jsonDb.get('images', function(error, image) {
+        image.active = !image.active;
+        if (typeof id == "undefined")
+            id = image.activeImage;
+        for (let i = 0; image.images.length > i; i++) {
+            if (image.images[i].id == id) {
+                image.activeId = image.images[i].id;
+                io.emit('changeImage', {
+                    "active": image.active,
+                    "activeImage": image.activeImage,
+                    "image": image.images[i]
+                });
+            }
+        }
+
+        if (id == 0)
+            io.emit('changeImage', {
+                "active": image.active,
+                "activeImage": image.activeImage,
+                "image": { "title": "", "url": "" }
+            });
+        jsonDb.save('images', image, function(error) {
+            if (error) throw error;
+        });
+        res.send({ val: image.active });
+
+    })
+}
+
+function editImage(req, res) {
+    let dataEdit = req.body;
+    jsonDb.get('images', function(error, image) {
+        for (let i = 0; image.images.length > i; i++) {
+            if (image.images[i].id == dataEdit.id) {
+                image.images[i].title = dataEdit.title;
+                image.images[i].url = dataEdit.url;
+
+                io.emit('editedImage', {
+                    "image": image.images[i]
+                });
+            }
+        }
+        jsonDb.save('images', image, function(error) {
+            if (error) throw error;
+        });
+
+        res.send({ result: true });
+    })
+}
+
 function editInfo(req, res) {
     let dataEdit = req.body;
     jsonDb.get('info', function(error, info) {
@@ -253,8 +317,9 @@ function editCam(id, prop) {
     return prop;
 }
 
-function editCamInfo(prop) {
+function editCamInfo(req, res) {
     let dataEdit = req.body;
+    let prop;
     jsonDb.get('cams', function(error, cams) {
         for (let i = 0; cams.cams.length > i; i++) {
             if (cams.cams[i].id == dataEdit.id) {
@@ -268,8 +333,8 @@ function editCamInfo(prop) {
             if (error) throw error;
         });
 
-        io.emit('editCamInfo', { "id": id, "prop": prop });
+        io.emit('editCamInfo', { "id": dataEdit.id, "prop": prop });
 
     })
-    return prop;
+    res.send({ result: true });
 }
