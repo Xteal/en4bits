@@ -22,7 +22,19 @@
     font-size: 30px;
 }
 
+.cam.editing {
+    border: 4px solid #031528;
+}
+
 .inactive {
     filter: grayscale(1);
     opacity: 0.5;
+}
+
+.camForm {
+    display: none;
+}
+
+.camForm.open {
+    display: block;
 }

@@ -92,6 +92,7 @@ jsonDb.get('config', function(error, conf) {
         appServer.get('/request/cam/toggle/:id', toogleCam);
         appServer.get('/request/cam/reset', resetCam);
         appServer.get('/request/cam/names/toggle', toogleNames);
+        appServer.post('/request/cam/edit/', editCamInfo);
 
         /* OBS REQUESTS */
         appServer.get('/request/obs/getScenes', getScenes);
@@ -229,7 +230,6 @@ function editInfo(req, res) {
     })
 }
 
-
 function editCam(id, prop) {
     jsonDb.get('cams', function(error, cams) {
         for (let i = 0; cams.cams.length > i; i++) {
@@ -248,6 +248,27 @@ function editCam(id, prop) {
         });
 
         io.emit('editCam', { "id": id, "prop": prop });
+
+    })
+    return prop;
+}
+
+function editCamInfo(prop) {
+    let dataEdit = req.body;
+    jsonDb.get('cams', function(error, cams) {
+        for (let i = 0; cams.cams.length > i; i++) {
+            if (cams.cams[i].id == dataEdit.id) {
+                cams.cams[i].nick = dataEdit.nick;
+                cams.cams[i].twitter = dataEdit.twitter;
+                cams.cams[i].cam = dataEdit.cam;
+                prop = cams.cams[i];
+            }
+        }
+        jsonDb.save('cams', cams, function(error) {
+            if (error) throw error;
+        });
+
+        io.emit('editCamInfo', { "id": id, "prop": prop });
 
     })
     return prop;

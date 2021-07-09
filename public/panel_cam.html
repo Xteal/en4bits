@@ -21,12 +21,21 @@
                     $(".cam[data-id='" + data.id + "']").addClass("inactive");
             });
 
+
+            socket.on('editCamInfo', function(data) {
+                $(".cam[data-id='" + data.id + "']").attr({
+                    "data-nick": data.prop.nick,
+                    "data-twitter": data.prop.twitter,
+                    "data-cam": data.prop.cam,
+                }).html(data.prop.nick);
+            });
+
             $.getJSON("/api/cams.json", function(cams) {
                 for (let [camKey, cam] of Object.entries(cams.cams)) {
                     let inactive = "";
                     if (!cam.active)
                         inactive = "inactive";
-                    $(".cams").append(`<div data-id="${cam.id}" class='cam ${inactive}' style="background-image:url('https://${config.domain}/backgrounds/${cam.id.toLowerCase()}.png')">${cam.id}</div> `)
+                    $(".cams").append(`<div data-id="${cam.id}" class='cam ${inactive}' data-nick='${cam.nick}' data-twitter='${cam.twitter}' data-cam='${cam.cam}' data-active="${cam.active}" style="background-image:url('https://${config.domain}/backgrounds/${cam.id.toLowerCase()}.png')">${cam.id}</div> `)
 
                 }
             })
@@ -39,9 +48,46 @@
                     let id = $(this).data("id");
                     fetch("https://" + config.domain + "/request/cam/toggle/" + id);
                 });
+                $('body').on('contextmenu', '.cam', function(ev) {
+                    ev.preventDefault();
+                    $(".cam").removeClass("editing");
+                    $(this).addClass("editing");
+                    $(".camForm").addClass("open")
+                    $("#inputId").val($(this).attr("data-id"));
+                    $("#inputNick").val($(this).attr("data-nick"));
+                    $("#inputTwitter").val($(this).attr("data-twitter"));
+                    $("#inputCam").val($(this).attr("data-cam"));
+                    $("#inputActive").val($(this).attr("data-active"));
+                    return false;
+                });
                 $('body').on('click', '.hardReset', function(e, elem) {
                     e.preventDefault();
                     fetch("https://" + config.domain + "/request/cam/reset/");
+                });
+
+                $('body').on('submit', '.form', function(e, elem) {
+                    e.preventDefault();
+                    let data = {
+                        id: $(this).find("input[name='id']").val(),
+                        nick: $(this).find("input[name='nick']").val(),
+                        twitter: $(this).find("input[name='twitter']").val(),
+                        cam: $(this).find("input[name='cam']").val()
+                    }
+
+                    fetch("https://" + config.domain + "/request/cam/edit", {
+                        method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                        mode: 'cors', // no-cors, *cors, same-origin
+                        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                        credentials: 'same-origin', // include, *same-origin, omit
+                        headers: {
+                            'Content-Type': 'application/json'
+                                // 'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        redirect: 'follow', // manual, *follow, error
+                        referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                        body: JSON.stringify(data) // body data type must match "Content-Type" header
+                    });
+
                 });
             });
 
@@ -55,6 +101,21 @@
         <div class="cams">
         </div>
         <input type='button' value="HARD RESET" class="hardReset">
+        <div class="camForm">
+            <form action="" method="POST" class="form">
+                <input type="hidden" name="id" id="inputId">
+                <label>
+                    Nick: <input type="text" name="nick" id="inputNick">
+                </label>
+                <label>
+                    Twitter: <input type="text" name="twitter" id="inputTwitter">
+                </label>
+                <label>
+                    Cam: <input type="checkbox" name="cam" id="inputCam">
+                </label><br>
+                <input type="submit" value="GUARDAR">
+            </form>
+        </div>
     </div>
 
 </body>
