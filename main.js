@@ -231,7 +231,7 @@ function tooggleImage(req, res) {
             id = image.activeImage;
         for (let i = 0; image.images.length > i; i++) {
             if (image.images[i].id == id) {
-                image.activeId = image.images[i].id;
+                image.activeImage = image.images[i].id;
                 io.emit('changeImage', {
                     "active": image.active,
                     "activeImage": image.activeImage,
