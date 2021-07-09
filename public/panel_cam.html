@@ -12,7 +12,7 @@
 
     <script>
         $.getJSON("/api/config.json", function(config) {
-            var socket = io.connect(config.domain + ":" + config.serverPort);
+            var socket = io.connect(config.domain);
 
             socket.on('editCam', function(data) {
                 if (data.prop)
@@ -35,7 +35,7 @@
                     let inactive = "";
                     if (!cam.active)
                         inactive = "inactive";
-                    $(".cams").append(`<div data-id="${cam.id}" class='cam ${inactive}' data-nick='${cam.nick}' data-twitter='${cam.twitter}' data-cam='${cam.cam}' data-active="${cam.active}" style="background-image:url('${config.domain+":" + config.serverPort}/backgrounds/${cam.id.toLowerCase()}.png')">${cam.id}</div> `)
+                    $(".cams").append(`<div data-id="${cam.id}" class='cam ${inactive}' data-nick='${cam.nick}' data-twitter='${cam.twitter}' data-cam='${cam.cam}' data-active="${cam.active}" style="background-image:url('${config.domain}/backgrounds/${cam.id.toLowerCase()}.png')">${cam.id}</div> `)
 
                 }
             })
@@ -46,7 +46,7 @@
                 $('body').on('click', '.cam', function(e, elem) {
                     e.preventDefault();
                     let id = $(this).data("id");
-                    fetch(config.domain + ":" + config.serverPort + "/request/cam/toggle/" + id);
+                    fetch(config.domain + "/request/cam/toggle/" + id);
                 });
                 $('body').on('contextmenu', '.cam', function(ev) {
                     ev.preventDefault();
@@ -62,7 +62,7 @@
                 });
                 $('body').on('click', '.hardReset', function(e, elem) {
                     e.preventDefault();
-                    fetch(config.domain + ":" + config.serverPort + "/request/cam/reset/");
+                    fetch(config.domain + "/request/cam/reset/");
                 });
 
                 $('body').on('submit', '.form', function(e, elem) {
@@ -74,7 +74,7 @@
                         cam: $(this).find("input[name='cam']").val()
                     }
 
-                    fetch(config.domain + ":" + config.serverPort + "/request/cam/edit", {
+                    fetch(config.domain + "/request/cam/edit", {
                         method: 'POST', // *GET, POST, PUT, DELETE, etc.
                         mode: 'cors', // no-cors, *cors, same-origin
                         cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached

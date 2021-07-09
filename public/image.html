@@ -9,7 +9,7 @@
     <script src="/js/socket.io.js"></script>
     <script>
         $.getJSON("/api/config.json", function(config) {
-            var socket = io.connect(config.domain + ":" + config.serverPort);
+            var socket = io.connect(config.domain);
 
             socket.on('changeImage', function(data) {
                 console.log(data)

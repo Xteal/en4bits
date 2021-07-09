@@ -14,7 +14,7 @@
 
     <script>
         $.getJSON("/api/config.json", function(config) {
-            var socket = io.connect(config.domain + ":" + config.serverPort);
+            var socket = io.connect(config.domain);
             socket.on('editedL3', function(data) {
                 console.log(data.l3.id)
                 let container = $(".l3[data-id='" + data.l3.id + "']");
@@ -46,7 +46,7 @@
                                                 <div class="lineHead">
                                                     <div class='identity ${activeClass}'>${l3item.id}</div><div class='status ${activeClass}'> <div class='dot'></div> <span class='text'>${activeClass!=""? "ACTIVO" : "INACTIVO" }</span></div> <div class="preview">${l3item.title.substring(0,55) + "..."}</div><div class="quickPlay ${activeClass!=""? "stop" : "play" }" data-id="${l3item.id}"><i class="fas ${activeClass!=""? "fa-stop" : "fa-play" }"></i></div>
                                                 </div>
-                                                <form class="form" action='${config.domain + ":" +config.serverPort}/editL3' method='post'>
+                                                <form class="form" action='${config.domain}/editL3' method='post'>
                                                     <input type='hidden' name='id' value='${l3item.id}'>
                                                     <input type='text' name='title' class='title' value='${l3item.title}'><br>
                                                     <textarea  name='subtitle' class='subtitle'>${l3item.subtitle}</textarea>
@@ -60,11 +60,11 @@
             $(document).ready(function() {
                 $('body').on('click', '.togglePlay', function(e, elem) {
                     let activeId = $(".activeId").val()
-                    fetch(config.domain + ":" + config.serverPort + '/request/l3/toggle/' + activeId)
+                    fetch(config.domain + '/request/l3/toggle/' + activeId)
                 })
                 $('body').on('click', '.quickPlay', function(e, elem) {
                     let activeId = $(this).data("id")
-                    fetch(config.domain + ":" + config.serverPort + '/request/l3/toggle/' + activeId)
+                    fetch(config.domain + '/request/l3/toggle/' + activeId)
                 })
                 $('body').on('click', '.lineHead .identity', function(e, elem) {
                     e.preventDefault();
@@ -85,7 +85,7 @@
 
                     $(this).parent().find(".preview").html(data.title.substring(0, 15) + "...");
 
-                    fetch(config.domain + ":" + config.serverPort + "/request/l3/edit", {
+                    fetch(config.domain + "/request/l3/edit", {
                         method: 'POST', // *GET, POST, PUT, DELETE, etc.
                         mode: 'cors', // no-cors, *cors, same-origin
                         cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
