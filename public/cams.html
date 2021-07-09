@@ -9,7 +9,7 @@
     <script src="/js/socket.io.js"></script>
     <script>
         $.getJSON("/api/config.json", function(config) {
-            var socket = io.connect('https://' + config.domain);
+            var socket = io.connect(config.domain);
             initCams(config);
 
             socket.on('resetCams', function(data) {
@@ -45,12 +45,12 @@
                     if (!cams.name)
                         activeNames = "inactive"
                     if (cam.cam) {
-                        $(".camContainer").append(`<div class="cam ${active}" data-id="${cam.id}" style="background-image:url('https://${config.domain}/backgrounds/${cam.id.toLowerCase()}.png')">
+                        $(".camContainer").append(`<div class="cam ${active}" data-id="${cam.id}" style="background-image:url('${config.domain}/backgrounds/${cam.id.toLowerCase()}.png')">
                                                 <div class='overlay ${activeNames}'><div class='nick'>${cam.nick}</div><div class='twitter'>@${cam.twitter}</div></div>
                                                 <video autoplay="true" playsinline  id="videoElement"></video>
                                             </div>`)
                     } else
-                        $(".camContainer").append(`<div class="cam ${active}" data-id="${cam.id}" style="background-image:url('https://${config.domain}/backgrounds/${cam.id.toLowerCase()}.png')">
+                        $(".camContainer").append(`<div class="cam ${active}" data-id="${cam.id}" style="background-image:url('${config.domain}/backgrounds/${cam.id.toLowerCase()}.png')">
                                                 <div class='overlay ${activeNames}'><div class='nick'>${cam.nick}</div><div class='twitter'>@${cam.twitter}</div></div>
                                                 <div class='iframeWrapper'><iframe src="https://obs.ninja/?view=${cam.id}&scene&room=en4bitse3&password=en4bitse3&na&transparent&cover" muted></iframe></div>
                                             </div>`)

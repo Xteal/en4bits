@@ -9,7 +9,7 @@
     <script src="/js/socket.io.js"></script>
     <script>
         $.getJSON("/api/config.json", function(config) {
-            var socket = io.connect('https://' + config.domain);
+            var socket = io.connect(config.domain);
 
             socket.on('editedInfo', function(data) {
                 let season = data.info.temporada;
