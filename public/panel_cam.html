@@ -56,7 +56,10 @@
                     $("#inputId").val($(this).attr("data-id"));
                     $("#inputNick").val($(this).attr("data-nick"));
                     $("#inputTwitter").val($(this).attr("data-twitter"));
-                    $("#inputCam").val($(this).attr("data-cam"));
+                    if ($(this).attr("data-cam"))
+                        $("#inputCam").prop("checked", true);
+                    else
+                        $("#inputCam").prop("checked", false);
                     $("#inputActive").val($(this).attr("data-active"));
                     return false;
                 });
@@ -67,11 +70,18 @@
 
                 $('body').on('submit', '.form', function(e, elem) {
                     e.preventDefault();
+                    let checkboxSelect;
+                    if ($(this).find("input[name='cam']").is(':checked'))
+                        checkboxSelect = true;
+                    else
+                        checkboxSelect = false;
+
+
                     let data = {
                         id: $(this).find("input[name='id']").val(),
                         nick: $(this).find("input[name='nick']").val(),
                         twitter: $(this).find("input[name='twitter']").val(),
-                        cam: $(this).find("input[name='cam']").val()
+                        cam: checkboxSelect
                     }
 
                     fetch(config.domain + "/request/cam/edit", {
