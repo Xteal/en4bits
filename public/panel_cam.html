@@ -56,7 +56,7 @@
                     $("#inputId").val($(this).attr("data-id"));
                     $("#inputNick").val($(this).attr("data-nick"));
                     $("#inputTwitter").val($(this).attr("data-twitter"));
-                    if ($(this).attr("data-cam"))
+                    if ($(this).attr("data-cam") == true || $(this).attr("data-cam") == "true")
                         $("#inputCam").prop("checked", true);
                     else
                         $("#inputCam").prop("checked", false);
