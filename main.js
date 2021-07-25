@@ -57,6 +57,12 @@ jsonDb.get('config', function(error, conf) {
 
 
         /* FRONT END VIEWS */
+
+        /* FRONT END VIEWS */
+        appServer.get('/pasapalabra', (req, res) => {
+            res.sendFile(__dirname + '/public/pasapalabra.html');
+        })
+
         appServer.get('/cams', (req, res) => {
             res.sendFile(__dirname + '/public/cams.html');
         })
