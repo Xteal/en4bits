@@ -116,7 +116,7 @@
                         letter: $(this).find("input[name='letter']").val(),
                         condition: $(this).find("input[name='condition']").val(),
                         answer: $(this).find("input[name='answer']").val(),
-                        description: $(this).find("textarea[name='description']").html()
+                        description: $(this).find("textarea[name='description']").val()
                     }
 
                     $(this).parent().find(".preview").html(data.answer);
