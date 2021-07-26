@@ -100,7 +100,10 @@ jsonDb.get('config', function(error, conf) {
             res.sendFile(__dirname + '/public/panel_obs.html');
         })
 
-        /* API REQUESTS */
+        appServer.get('/panel/pasapalabra', (req, res) => {
+                res.sendFile(__dirname + '/public/panel_pasapalabra.html');
+            })
+            /* API REQUESTS */
 
         /* CAM REQUESTS */
         appServer.get('/request/cam/toggle/:id', toogleCam);
@@ -115,6 +118,14 @@ jsonDb.get('config', function(error, conf) {
         /* L3 REQUESTS */
         appServer.get('/request/l3/toggle/:id?', tooggleL3);
         appServer.post('/request/l3/edit', editL3);
+
+        /* PASAPALABRA REQUESTS */
+        appServer.get('/request/pasapalabra/timer/:seconds?', pasapalabraTimer);
+        appServer.post('/request/pasapalabra/edit', editWord);
+        appServer.get('/request/pasapalabra/start/', startPasapalabra);
+        appServer.get('/request/pasapalabra/checkAnswer/:answer?', checkPasapalabraAnswer);
+        appServer.get("/request/pasapalabra/pasapalabra/", doPasapalabra)
+        appServer.get("/request/pasapalabra/restart/", pasapalabraRestart)
 
         /* IMAGE REQUESTS */
         appServer.get('/request/image/toggle/:id?', tooggleImage);
@@ -227,6 +238,98 @@ function editL3(req, res) {
 
         res.send({ result: true });
     })
+}
+
+function pasapalabraTimer(req, res) {
+    let seconds = req.params.seconds;
+    io.emit('pasapalabra_coutdown', {
+        "seconds": seconds
+    });
+    res.send({ result: true });
+}
+
+function startPasapalabra(req, res) {
+    let dataEdit = req.body;
+    jsonDb.get('pasapalabra', function(error, pasapalabra) {
+        pasapalabra.position = 0;
+        pasapalabra.status = "ONGOING";
+        jsonDb.save('pasapalabra', pasapalabra, function(error) {
+            if (error) throw error;
+            io.emit('pasapalabra_start', {
+                "position": pasapalabra.position
+            });
+        });
+
+        res.send({ result: true });
+    })
+}
+
+function pasapalabraRestart(req, res) {
+    let dataEdit = req.body;
+    jsonDb.get('pasapalabra', function(error, pasapalabra) {
+        pasapalabra.position = 0;
+        pasapalabra.status = "WAITING";
+        jsonDb.save('pasapalabra', pasapalabra, function(error) {
+            if (error) throw error;
+            io.emit('pasapalabra_restart', {
+                "position": pasapalabra.position
+            });
+        });
+
+        res.send({ result: true });
+    })
+}
+
+function editWord(req, res) {
+    let dataEdit = req.body;
+    jsonDb.get('pasapalabra', function(error, pasaparalabra) {
+        for (let i = 0; pasaparalabra.words.length > i; i++) {
+            if (pasaparalabra.words[i].letter == dataEdit.letter) {
+                pasaparalabra.words[i].answer = dataEdit.answer;
+                pasaparalabra.words[i].condition = dataEdit.condition;
+                pasaparalabra.words[i].description = dataEdit.description;
+                console.log(pasaparalabra.words[i])
+                io.emit('editedWord', {
+                    "word": pasaparalabra.words[i]
+                });
+            }
+        }
+
+        jsonDb.save('pasapalabra', pasaparalabra, function(error) {
+            if (error) throw error;
+        });
+
+        res.send({ result: true });
+    })
+}
+
+function checkPasapalabraAnswer(req, res) {
+    let answer = req.params.answer;
+    jsonDb.get('pasapalabra', function(error, pasaparalabra) {
+        let position = pasaparalabra.position;
+        pasaparalabra.position = pasaparalabra.position + 1;
+        jsonDb.save('pasapalabra', pasaparalabra, function(error) {
+            if (error) throw error;
+            io.emit('pasapalabra_answer', {
+                "position": position,
+                "answer": answer
+            });
+            res.send({ result: true });
+        });
+    });
+}
+
+function doPasapalabra(req, res) {
+    jsonDb.get('pasapalabra', function(error, pasaparalabra) {
+        let position = pasaparalabra.position;
+        jsonDb.save('pasapalabra', pasaparalabra, function(error) {
+            if (error) throw error;
+            io.emit('pasapalabra', {
+                "position": position
+            });
+            res.send({ result: true });
+        });
+    });
 }
 
 function tooggleImage(req, res) {

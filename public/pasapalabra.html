@@ -11,11 +11,14 @@
 </head>
 
 <body>
+    <audio id="error" muted>
+        <source src="sounds/error.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="success" muted>
+        <source src="sounds/success.mp3" type="audio/mpeg">
+    </audio>
     <section class="game">
         <div class="circle-container">
-            <div class="title-container">
-                <p class="title">PASAPALABRA</p>
-            </div>
             <ul class="circle">
                 <li class="item">A</li>
                 <li class="item">B</li>
@@ -48,10 +51,17 @@
                 <li id="js--score" class="score" href="">25</li>
             </ul>
         </div>
+
     </section>
+    <div class="controls-container">
+        <div id="js--question-controls" class="question-controls hidden">
+            <span id="js--hint" class="hint"></span>
+            <p id="js--definition" class="definition"></p>
+        </div>
+    </div>
     <script src="/js/jquery.js"></script>
     <script src="/js/socket.io.js"></script>
-    <script src="js/pasapalabra.js"></script>
+    <script src="/js/pasapalabra.js"></script>
 </body>
 
 </html>

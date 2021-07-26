@@ -1,0 +1,142 @@
+body {
+    background: #cc3939;
+}
+
+textarea {
+    min-height: 90px;
+}
+
+.container {
+    display: flex;
+}
+
+input[type="button"] {
+    margin: 0 20px;
+}
+
+.chat {
+    margin-left: 10px;
+    background: #031528;
+    height: 100vh;
+}
+
+.position {
+    padding: 10px;
+    height: 100%;
+    border: 2px solid #031528;
+    color: #031528;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+}
+
+.wordContainer {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    padding-right: 10px;
+    padding-bottom: 150px;
+    display: flex;
+    white-space: nowrap;
+    flex-wrap: wrap;
+}
+
+.word {
+    flex-grow: 1;
+}
+
+.word form {
+    height: 0;
+    overflow: hidden;
+}
+
+.word form.open {
+    height: auto;
+}
+
+.infoText {
+    margin-bottom: 20px;
+}
+
+.controls {
+    position: fixed;
+    padding: 10px;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    text-align: center;
+    padding: 20px;
+    background: #cc3939;
+    box-sizing: border-box;
+}
+
+.controlButton {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.lineHead {
+    display: flex;
+    align-items: center;
+    height: 60px;
+}
+
+.identity {
+    border: 2px solid #031528;
+    color: #031528;
+    width: 20px;
+    font-family: 'Scout-Black';
+    padding: 5px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.identity.active {
+    background: #031528;
+    color: #cc3939;
+}
+
+.preview {
+    font-family: 'Scout-Black';
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    color: white;
+    line-height: 1;
+}
+
+.active {
+    clip-path: inset(0 0 0 0);
+}
+
+.success {
+    background: green
+}
+
+.fail {
+    background: red
+}
+
+.pasapalabra {
+    background: yellow
+}
+
+.conditionText {
+    font-size: 40px;
+}
+
+.descriptionText {
+    font-size: 40px;
+    font-family: 'Scout-Regular';
+}
+
+.answerText {
+    font-size: 40px;
+    opacity: .3;
+}

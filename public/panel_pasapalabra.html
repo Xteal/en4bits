@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>en4bits - PASAPALABRA Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/css/fonts.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" referrerpolicy="no-referrer"
+    />
+    <link href="/css/global.css" rel="stylesheet">
+    <link href="/css/pasapalabraEdit.css" rel="stylesheet">
+    <script src="/js/jquery.js"></script>
+    <script src="/js/socket.io.js"></script>
+
+    <script>
+        let position = 0;
+        let timer = 150;
+        let secondLap = false;
+        $.getJSON("/api/config.json", function(config) {
+            var socket = io.connect(config.domain);
+
+
+            socket.on('editedWord', function(data) {
+
+                let container = $(".word[data-letter='" + data.word.letter + "']");
+                container.find(".condition").val(data.word.condition);
+                container.find(".answer").val(data.word.answer);
+                container.find(".description").html(data.word.description)
+            });
+
+            socket.on('changeL3', function(data) {
+                let active = data.active;
+                let activeId = data.activeId;
+                changeState(active, activeId)
+            });
+
+            socket.on('pasapalabra_coutdown', function(data) {
+                console.log(data)
+                $(".position").html(data.seconds)
+            });
+
+            $.getJSON("/api/pasapalabra.json", function(pasapalabra) {
+                position = pasapalabra.position;
+                let status = pasapalabra.status;
+                for (let [wordKey, word] of Object.entries(pasapalabra.words)) {
+                    if (wordKey == position) {
+                        $(".conditionText").html(word.condition);
+                        $(".descriptionText").html(word.description);
+                        $(".answerText").html(word.answer);
+                    }
+                    $(".wordContainer").append(`<div class='word' data-letter="${word.letter}" data-position="${wordKey}">
+                                                <div class="lineHead">
+                                                    <div class='identity'>${word.letter}</div> <div class="preview">${word.answer}</div>
+                                                </div>
+                                                <form class="form" action='${config.domain}/editWord' method='post'>
+                                                    <input type='hidden' name='letter' value='${word.letter}'>
+                                                    <input type='text' name='condition' class='condition' value='${word.condition}'><br>
+                                                    <input type='text' name='answer' class='answer' value='${word.answer}'><br>
+                                                    <textarea  name='description' class='description'>${word.description}</textarea><br>
+                                                    <input type="submit" value="Guardar">
+                                                </form>
+                                            </div>`)
+
+                }
+            })
+
+            $(document).ready(function() {
+                $('body').on('click', '.startGame', function(e, elem) {
+                    let activeId = $(".activeId").val()
+                    fetch(config.domain + '/request/pasapalabra/start/')
+
+                })
+                $('body').on('click', '.pasapalabra', function(e, elem) {
+                    let activeId = $(".activeId").val()
+                    fetch(config.domain + '/request/pasapalabra/pasapalabra/')
+                    stepWord(-1);
+                })
+
+                $('body').on('click', '.success', function(e, elem) {
+                    fetch(config.domain + '/request/pasapalabra/checkAnswer/1')
+                    stepWord(1);
+                })
+                $('body').on('click', '.fail', function(e, elem) {
+                    fetch(config.domain + '/request/pasapalabra/checkAnswer/0')
+                    stepWord(0);
+                })
+                $('body').on('click', '.restart', function(e, elem) {
+                    fetch(config.domain + '/request/pasapalabra/restart/');
+                    $(".word .identity").removeClass("success fail pasapalabra");
+                    position = 0;
+                    let condition = $(".word[data-position=0]").find("input[name='condition']").val();
+                    let description = $(".word[data-position=0]").find("textarea[name='description']").html();
+                    let answer = $(".word[data-position=0]").find("input[name='answer']").val();
+
+                    $(".conditionText").html(condition);
+                    $(".descriptionText").html(description);
+                    $(".answerText").html(answer);
+                })
+
+                $('body').on('click', '.quickPlay', function(e, elem) {
+                    let activeId = $(this).data("id")
+                    fetch(config.domain + '/request/l3/toggle/' + activeId)
+                })
+                $('body').on('click', '.lineHead .identity', function(e, elem) {
+                    e.preventDefault();
+                    let parent = $(this).parent().parent();
+                    let formFind = parent.find('form');
+                    if (formFind.hasClass("open"))
+                        formFind.removeClass("open");
+                    else
+                        formFind.addClass("open");
+                });
+                $('body').on('submit', '.form', function(e, elem) {
+                    e.preventDefault();
+                    let data = {
+                        letter: $(this).find("input[name='letter']").val(),
+                        condition: $(this).find("input[name='condition']").val(),
+                        answer: $(this).find("input[name='answer']").val(),
+                        description: $(this).find("textarea[name='description']").html()
+                    }
+
+                    $(this).parent().find(".preview").html(data.answer);
+
+                    fetch(config.domain + "/request/pasapalabra/edit", {
+                        method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                        mode: 'cors', // no-cors, *cors, same-origin
+                        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                        credentials: 'same-origin', // include, *same-origin, omit
+                        headers: {
+                            'Content-Type': 'application/json'
+                                // 'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        redirect: 'follow', // manual, *follow, error
+                        referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                        body: JSON.stringify(data) // body data type must match "Content-Type" header
+                    });
+
+                });
+            });
+
+            function stepWord(state) {
+
+                switch (state) {
+                    case -1:
+                        $(".word[data-position=" + position + "]").find(".identity").removeClass("success fail").addClass("pasapalabra");
+                        break;
+                    case 0:
+                        $(".word[data-position=" + position + "]").find(".identity").removeClass("pasapalabra success").addClass("fail");
+                        break;
+                    case 1:
+                        $(".word[data-position=" + position + "]").find(".identity").removeClass("fail pasapalabra").addClass("success");
+                        break;
+                }
+                position++;
+                if (position >= $(".word").length || secondLap) {
+                    secondLap = true;
+                    console.log("SOY MAYOR")
+                    let find = false;
+                    $(".word").each(function(k, v) {
+                        if (!find && $(this).find(".identity").hasClass("pasapalabra")) {
+                            console.log("SOY PASAPALABRA " + $(this).attr("data-position"))
+                            position = $(this).attr("data-position");
+                            find = true;
+                        }
+                    })
+                }
+
+                console.log(position + " " + $(".word").length)
+                let condition = $(".word[data-position=" + position + "]").find("input[name='condition']").val();
+                let description = $(".word[data-position=" + position + "]").find("textarea[name='description']").html();
+                let answer = $(".word[data-position=" + position + "]").find("input[name='answer']").val();
+
+                $(".conditionText").html(condition);
+                $(".descriptionText").html(description);
+                $(".answerText").html(answer);
+            }
+        });
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="controls">
+            <div class="infoText">
+                <div class="positionText">
+                    <div class="conditionText"></div>
+                    <div class="descriptionText"></div>
+                    <div class="answerText"></div>
+                </div>
+            </div>
+
+            <div class="controlButton">
+                <div class="position"></div>
+                <input type="button" class="startGame" value="PLAY"> <input type="button" class="success" value="ACIERTO"> <input type="button" class="fail" value="FALLO"> <input type="button" class="pasapalabra" value="PASAPALABRA"> <input type="button"
+                    class="restart" value="RESTART">
+            </div>
+
+        </div>
+        <div class="wordContainer">
+        </div>
+    </div>
+
+</body>
+
+</html>
