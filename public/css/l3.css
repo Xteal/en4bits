@@ -62,6 +62,11 @@
 
 .image {
     max-width: 0;
+    height: 100%;
+}
+
+.image img {
+    height: 100%;
 }
 
 .image.with-image {

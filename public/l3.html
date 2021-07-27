@@ -20,7 +20,9 @@
                         $(".image").addClass("with-image").find("img").attr("src", data.l3.image)
                     $(".title").html(data.l3.title);
                     $(".subtitle").html(data.l3.subtitle);
-                    $(".l3").addClass("active");
+                    setTimeout(function() {
+                        $(".l3").addClass("active");
+                    }, 800)
                 }
             });
         });
