@@ -4,6 +4,7 @@ const Store = require("jfs");
 const jsonDb = new Store(path.join(__dirname, "/userData"));
 const bodyParser = require('body-parser');
 const express = require('express');
+const { config } = require('process');
 const appServer = express();
 const server = require('http').Server(appServer);
 const io = require("socket.io")(server);
@@ -41,7 +42,7 @@ jsonDb.get('config', function(error, conf) {
             conf.ip = myIp;
             jsonDb.save('config', conf, function(error) {
                 if (error) throw error;
-                console.log('Servidor corriendo en ' + conf.domain + ':' + conf.serverPort);
+                console.log('Servidor corriendo en ' + conf.domain + ':' + conf.serverPort " [IP: " + conf.ip + "]");
             });
         })();
 
