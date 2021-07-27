@@ -226,6 +226,7 @@ function editL3(req, res) {
             if (l3.lower_thirds[i].id == dataEdit.id) {
                 l3.lower_thirds[i].title = dataEdit.title;
                 l3.lower_thirds[i].subtitle = dataEdit.subtitle;
+                l3.lower_thirds[i].image = dataEdit.image;
 
                 io.emit('editedL3', {
                     "l3": l3.lower_thirds[i]

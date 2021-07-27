@@ -48,6 +48,7 @@
                                                 </div>
                                                 <form class="form" action='${config.domain}/editL3' method='post'>
                                                     <input type='hidden' name='id' value='${l3item.id}'>
+                                                    <input type='text' name='image' class='image' value='${l3item.image}'><br>
                                                     <input type='text' name='title' class='title' value='${l3item.title}'><br>
                                                     <textarea  name='subtitle' class='subtitle'>${l3item.subtitle}</textarea>
                                                     <input type="submit" value="Guardar">
@@ -80,7 +81,8 @@
                     let data = {
                         id: $(this).find("input[name='id']").val(),
                         title: $(this).find("input[name='title']").val(),
-                        subtitle: $(this).find("textarea").val()
+                        subtitle: $(this).find("textarea").val(),
+                        image: $(this).find("input[name='image']").val()
                     }
 
                     $(this).parent().find(".preview").html(data.title.substring(0, 15) + "...");
