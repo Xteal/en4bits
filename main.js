@@ -37,16 +37,15 @@ jsonDb.get('config', function(error, conf) {
     });
 
     server.listen(conf.serverPort, function() {
-        (async() => {
-            myIp = await publicIp.v4();
-            conf.ip = myIp;
-            if (process.env.DOMAIN)
-                conf.domain = process.env.DOMAIN;
-            jsonDb.save('config', conf, function(error) {
-                if (error) throw error;
-                console.log('Servidor corriendo en ' + conf.domain + ':' + conf.serverPort + " [IP: " + conf.ip + "]");
-            });
-        })();
+        if (process.env.DOMAIN) {
+            conf.domain = process.env.DOMAIN;
+        }
+
+        jsonDb.save('config', conf, function(error) {
+            if (error) throw error;
+            console.log(process.env)
+            console.log('Servidor corriendo en ' + conf.domain + ':' + conf.serverPort + " [IP: " + conf.ip + "]");
+        });
 
         appServer.use(bodyParser.urlencoded({ extended: true }));
         appServer.use(bodyParser.json());
@@ -57,9 +56,6 @@ jsonDb.get('config', function(error, conf) {
         appServer.use('/css', express.static(__dirname + '/public/css'));
         appServer.use('/js', express.static(__dirname + '/public/js'));
         appServer.use('/backgrounds', express.static(__dirname + '/public/img/panic/'));
-
-
-        /* FRONT END VIEWS */
 
         /* FRONT END VIEWS */
         appServer.get('/pasapalabra', (req, res) => {
