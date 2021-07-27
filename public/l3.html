@@ -22,7 +22,7 @@
                         $(".image").removeClass("with-image");
 
                     if (data.l3.title == "" && data.l3.subtitle == "")
-                        $(".text").addClass("no-text").find("img").attr("src", data.l3.image)
+                        $(".text").addClass("no-text");
                     else
                         $(".text").removeClass("no-text");
                     $(".title").html(data.l3.title);

@@ -67,7 +67,7 @@
 .image {
     max-width: 0;
     height: 100%;
-    overflow: hiddengit;
+    overflow: hidden;
 }
 
 .image img {
