@@ -19,6 +19,10 @@
     padding: 10px 50px;
 }
 
+.text.no-text {
+    padding: 0;
+}
+
 .cam {
     box-sizing: border-box;
     position: relative;
@@ -63,7 +67,7 @@
 .image {
     max-width: 0;
     height: 100%;
-    overflow: hidden;
+    overflow: hiddengit;
 }
 
 .image img {

@@ -20,6 +20,11 @@
                         $(".image").addClass("with-image").find("img").attr("src", data.l3.image)
                     else
                         $(".image").removeClass("with-image");
+
+                    if (data.l3.title == "" && data.l3.subtitle == "")
+                        $(".text").addClass("no-text").find("img").attr("src", data.l3.image)
+                    else
+                        $(".text").removeClass("no-text");
                     $(".title").html(data.l3.title);
                     $(".subtitle").html(data.l3.subtitle);
                     setTimeout(function() {
