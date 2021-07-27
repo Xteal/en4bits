@@ -16,6 +16,8 @@
                 if (!data.active) {
                     $(".l3").removeClass("active");
                 } else {
+                    if (data.l3.image != "")
+                        $(".image").addClass("with-image").find("img").attr("src", data.l3.image)
                     $(".title").html(data.l3.title);
                     $(".subtitle").html(data.l3.subtitle);
                     $(".l3").addClass("active");
@@ -27,8 +29,11 @@
 
 <body>
     <div class="l3">
-        <div class="title"></div>
-        <div class="subtitle"></div>
+        <div class="image"><img src="" alt="" title=""></div>
+        <div class="text">
+            <div class="title"></div>
+            <div class="subtitle"></div>
+        </div>
     </div>
 </body>
 

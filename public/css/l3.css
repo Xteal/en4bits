@@ -4,14 +4,19 @@
     bottom: 35px;
     height: 180px;
     display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    transition: all 1s;
+    clip-path: inset(0 100% 0 0);
+    background: #031528;
+    max-width: 1200px;
+}
+
+.text {
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
-    transition: all 1s;
-    clip-path: inset(0 100% 0 0);
     padding: 10px 50px;
-    background: #031528;
-    max-width: 1200px;
 }
 
 .cam {
@@ -53,4 +58,12 @@
 
 .subtitle b {
     font-family: 'ScoutCond-Bold';
+}
+
+.image {
+    max-width: 0;
+}
+
+.image.with-image {
+    max-width: 100%;
 }
