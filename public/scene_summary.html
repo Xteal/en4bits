@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>en4Bits - Scene Summary</title>
+    <link href="/css/opensans.css" rel="stylesheet">
+    <link href="/css/scene-global.css" rel="stylesheet">
+    <link href="/css/scene-summary.css" rel="stylesheet">
+    <script src="/js/jquery.js"></script>
+    <script src="/js/gsap.min.js"></script>
+    <script src="/js/socket.io.js"></script>
+    <script>
+        let season;
+        let episode;
+        $.getJSON("/api/config.json", function(config) {
+            var socket = io.connect(config.domain);
+            socket.on('resetSummary', function(data) {
+                location.reload();
+            });
+            socket.on('highlightSummary', function(highlightData) {
+                $(".mediaSummary, .summary").removeClass("active");
+                $(`.mediaSummary[data-id='${highlightData.id}'], .summary[data-id='${highlightData.id}']`).addClass("active");
+            });
+            $.getJSON("/api/info.json", function(info) {
+                season = info.temporada;
+                episode = info.capitulo;
+                $(".version").html(`v.${season}.${episode>9? episode : '0'+episode}`)
+            });
+
+            $.getJSON("/api/summary.json", function(summaryData) {
+                for (let [summaryKey, summary] of Object.entries(summaryData.summary)) {
+                    $(".summaryContainer").append(`<div class='summary ${summary.id==summaryData.activeId? "active" : ""}' data-id="${summary.id}">${summary.title}</div>`);
+                    let media;
+                    switch (summary.mediaType) {
+                        case "image":
+                            media = `<img src='${summary.media}'>`;
+                            break;
+                        case "video":
+                            media = `<video width="auto" height="100%" autoplay muted loop>
+                                        <source src="${summary.media}" type="video/mp4">
+                                    </video>`;
+                    }
+
+                    $(".media").append(`<div class='mediaSummary ${summary.id==summaryData.activeId? "active" : ""}' data-id='${summary.id}'>${media}</div>`);
+                }
+            })
+            var static = $('.noise');
+            staticAnimate(static);
+
+            function staticAnimate(object) {
+                TweenMax.to(object, .03, {
+                    backgroundPosition: Math.floor(Math.random() * 100) + 1 + "% " + Math.floor(Math.random() * 10) + 1 + "%",
+                    onComplete: staticAnimate,
+                    onCompleteParams: [object],
+                    ease: SteppedEase.config(1)
+                });
+            }
+
+        });
+    </script>
+</head>
+
+<body>
+    <div class="noise"></div>
+    <div class="container">
+        <div class="logo">en4Bits</div>
+        <div class="summaryTitle">Patch Notes <span class='version'>v.1.12</span></div>
+        <div class="summarySubtitle"><b>//</b> Miércoles 12 de septiembre</div>
+        <div class="summaryContainer">
+
+        </div>
+        <div class="disclaimer">
+            Esto es un texto que pongo aquí para rellenar este hueco que no se que poner, podrían ir hasta patrocinadores pero no hay asi que hay que joderse.
+        </div>
+    </div>
+    <div class="media">
+        <div class="overlay"></div>
+        <div class="overlay"></div>
+    </div>
+</body>
+
+</html>

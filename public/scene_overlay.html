@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>en4bits - Overlay</title>
+    <link href="/css/opensans.css" rel="stylesheet">
+    <link href="/css/scene-global.css" rel="stylesheet">
+    <link href="/css/scene-overlay.css" rel="stylesheet">
+    <script src="/js/jquery.js"></script>
+    <script src="/js/socket.io.js"></script>
+    <script>
+        $.getJSON("/api/config.json", function(config) {
+            var socket = io.connect(config.domain);
+
+            const urlSearchParams = new URLSearchParams(window.location.search);
+            const params = Object.fromEntries(urlSearchParams.entries());
+
+            if (typeof params.invert != "undefined")
+                if (params.invert)
+                    $(".container").addClass("invert");
+
+            if (typeof params.overlay != "undefined")
+                if (params.overlay)
+                    $(".container").addClass("overlay");
+
+            console.log(params);
+
+            socket.on('editedInfo', function(data) {
+                let season = data.info.temporada;
+                let episode = data.info.capitulo;
+                let title = data.info.titulo;
+                let hashtag = data.info.hashtag;
+
+                $(".episode").html("v." + season + "." + (episode < 10 ? "0" + episode : episode));
+                $(".nombre").html(title);
+                $(".outline, .normal").html(hashtag)
+            });
+
+            $.getJSON("/api/info.json", function(info) {
+                let episode = info.capitulo < 10 ? "0" + info.capitulo : info.capitulo;
+                $(".episode").html("v." + info.temporada + "." + episode);
+                $(".nombre").html(info.titulo);
+                $(".outline, .normal").html(info.hashtag)
+            })
+
+            socket.on('editCam', function(data) {
+
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="title">
+            <div class="episode">
+
+            </div>
+            <div class="nombre">
+
+            </div>
+        </div>
+        <div class="hashtag">
+            <div class="normal"></div>
+        </div>
+    </div>
+</body>
+
+</html>

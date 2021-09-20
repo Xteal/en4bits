@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>en4bits - L3</title>
+    <link href="/css/opensans.css" rel="stylesheet">
+    <link href="/css/scene-global.css" rel="stylesheet">
+    <link href="/css/scene-l3.css" rel="stylesheet">
+    <script src="/js/jquery.js"></script>
+    <script src="/js/socket.io.js"></script>
+    <script>
+        $.getJSON("/api/config.json", function(config) {
+            var socket = io.connect(config.domain);
+
+            socket.on('changeL3', function(data) {
+                console.log(data)
+                if (!data.active) {
+                    $(".l3").removeClass("active");
+                } else {
+                    if (data.l3.image != "")
+                        $(".image").addClass("with-image").find("img").attr("src", data.l3.image)
+                    else
+                        $(".image").removeClass("with-image");
+
+                    if (data.l3.title == "" && data.l3.subtitle == "")
+                        $(".text").addClass("no-text");
+                    else
+                        $(".text").removeClass("no-text");
+                    $(".title").html(data.l3.title);
+                    $(".subtitle").html(data.l3.subtitle);
+                    setTimeout(function() {
+                        $(".l3").addClass("active");
+                    }, 800)
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <div class="l3">
+        <div class="image"><img src="" alt="" title=""></div>
+        <div class="text">
+            <div class="title"></div>
+            <div class="subtitle"></div>
+        </div>
+    </div>
+</body>
+
+</html>

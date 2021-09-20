@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>en4Bits - Scene Summary</title>
+    <link href="/css/opensans.css" rel="stylesheet">
+    <link href="/css/scene-global.css" rel="stylesheet">
+    <link href="/css/scene-background.css" rel="stylesheet">
+    <script src="/js/jquery.js"></script>
+    <script src="/js/socket.io.js"></script>
+    <script>
+        $.getJSON("/api/config.json", function(config) {
+            const urlSearchParams = new URLSearchParams(window.location.search);
+            const params = Object.fromEntries(urlSearchParams.entries());
+
+            if (typeof params.type != "undefined")
+                if (params.type)
+                    $(".container").addClass(params.type);
+
+            var socket = io.connect(config.domain);
+        });
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <img src='/img/noiseBlack.png'>
+    </div>
+</body>
+
+</html>

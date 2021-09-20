@@ -55,7 +55,30 @@ jsonDb.get('config', function(error, conf) {
         appServer.use('/api', express.static(__dirname + '/userData'));
         appServer.use('/css', express.static(__dirname + '/public/css'));
         appServer.use('/js', express.static(__dirname + '/public/js'));
+        appServer.use('/img', express.static(__dirname + '/public/img'));
         appServer.use('/backgrounds', express.static(__dirname + '/public/img/panic/'));
+
+        /* SCENE VIEWS */
+        appServer.get('/v2/scene/overlay', (req, res) => {
+            res.sendFile(__dirname + '/public/scene_overlay.html');
+        })
+        appServer.get('/v2/scene/countdown', (req, res) => {
+            res.sendFile(__dirname + '/public/scene_countdown.html');
+        })
+        appServer.get('/v2/scene/summary', (req, res) => {
+            res.sendFile(__dirname + '/public/scene_summary.html');
+        })
+        appServer.get('/v2/scene/cams', (req, res) => {
+            res.sendFile(__dirname + '/public/scene_cams.html');
+        })
+        appServer.get('/v2/scene/l3', (req, res) => {
+            res.sendFile(__dirname + '/public/scene_l3.html');
+        })
+        appServer.get('/v2/scene/background/', (req, res) => {
+            res.sendFile(__dirname + '/public/scene_background.html');
+        })
+
+
 
         /* FRONT END VIEWS */
         appServer.get('/pasapalabra', (req, res) => {
@@ -85,6 +108,14 @@ jsonDb.get('config', function(error, conf) {
 
         appServer.get('/panel/l3', (req, res) => {
             res.sendFile(__dirname + '/public/panel_l3.html');
+        })
+
+        appServer.get('/panel/summary', (req, res) => {
+            res.sendFile(__dirname + '/public/panel_summary.html');
+        })
+
+        appServer.get('/panel/countdown', (req, res) => {
+            res.sendFile(__dirname + '/public/panel_countdown.html');
         })
 
         appServer.get('/panel/image', (req, res) => {
@@ -117,6 +148,20 @@ jsonDb.get('config', function(error, conf) {
         /* L3 REQUESTS */
         appServer.get('/request/l3/toggle/:id?', tooggleL3);
         appServer.post('/request/l3/edit', editL3);
+
+        /* SUMMARY REQUESTS */
+        appServer.get('/request/summary/highlight/:id?', summaryHighlight);
+        appServer.get('/request/summary/reset', resetSummary);
+        appServer.post('/request/summary/edit', editSummary);
+
+        /* COUNTDOWN REQUESTS */
+        appServer.get('/request/countdown/startBumper', startBumper);
+        appServer.get('/request/countdown/start', startCountdown);
+        appServer.get('/request/countdown/add', addCountdown);
+        appServer.get('/request/countdown/subtract', subtractCountdown);
+        appServer.get('/request/countdown/reset', resetCountdown);
+        appServer.post('/request/countdown/edit', editCountdown);
+        appServer.post('/request/countdown/editPhrases', editPhrases);
 
         /* PASAPALABRA REQUESTS */
         appServer.get('/request/pasapalabra/timer/:seconds?', pasapalabraTimer);
@@ -170,6 +215,51 @@ function switchScene(req, res) {
 
 }
 
+function startCountdown(req, res) {
+    io.emit('startCountdown');
+    res.send({ val: true })
+}
+
+function startBumper(req, res) {
+    io.emit('startBumper');
+    res.send({ val: true })
+}
+
+function subtractCountdown(req, res) {
+    io.emit('subtractCountdown');
+    res.send({ val: true })
+}
+
+function editPhrases(req, res) {
+    let dataEdit = req.body;
+    let newPhrases = {};
+    jsonDb.get('loadPhrases', function(error, summaryData) {
+        newPhrases.phrases = dataEdit;
+        jsonDb.save('loadPhrases', newPhrases, function(error) {
+            if (error) throw error;
+        });
+
+        res.send({ result: true });
+    })
+}
+
+function editCountdown() {}
+
+function addCountdown(req, res) {
+    io.emit('addCountdown');
+    res.send({ val: true })
+}
+
+function resetCountdown(req, res) {
+    io.emit('resetCountdown');
+    res.send({ val: true })
+}
+
+function resetSummary(req, res) {
+    io.emit('resetSummary');
+    res.send({ val: true })
+}
+
 function resetCam(req, res) {
     io.emit('resetCams');
     res.send({ val: true })
@@ -184,6 +274,44 @@ function toogleNames(req, res) {
         });
         io.emit('toggleNames', { "prop": cams.name });
         res.send({ val: cams.name });
+    })
+}
+
+function summaryHighlight(req, res) {
+    let id = req.params.id;
+    jsonDb.get('summary', function(error, summaryData) {
+        if (typeof id == "undefined")
+            id = summaryData.activeId;
+
+
+        summaryData.activeId = id;
+        io.emit('highlightSummary', {
+            "id": summaryData.activeId
+        });
+        jsonDb.save('summary', summaryData, function(error) {
+            if (error) throw error;
+        });
+        res.send({ val: summaryData.activeId });
+    });
+}
+
+function editSummary(req, res) {
+    let dataEdit = req.body;
+    let newSummary = {};
+    jsonDb.get('summary', function(error, summaryData) {
+        newSummary.activeId = summaryData.activeId;
+        newSummary.summary = dataEdit;
+
+        io.emit('editedSummary', {
+            "summaryData": newSummary
+        });
+        io.emit('resetSummary');
+
+        jsonDb.save('summary', newSummary, function(error) {
+            if (error) throw error;
+        });
+
+        res.send({ result: true });
     })
 }
 

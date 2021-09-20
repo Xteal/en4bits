@@ -1,0 +1,148 @@
+body {
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0;
+    padding: 0;
+    color: var(--backgroundDark);
+}
+
+.container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+}
+
+.countdown {
+    position: absolute;
+    right: 125px;
+    font-size: 30px;
+    top: 720px;
+    font-family: "OpenSans-Regular";
+    text-align: right;
+    z-index: 2;
+}
+
+.titulo {
+    font-family: "OpenSansCondensed-Bold";
+    font-size: 100px;
+    color: white;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    flex-direction: column;
+    transform: translateY(-2000px);
+    z-index: 4;
+}
+
+.titulo .version {
+    font-size: 150px;
+    color: var(--primary);
+    font-family: "OpenSans-ExtraBold";
+}
+
+.wipeContainer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    white-space: nowrap;
+    z-index: 2;
+}
+
+.wipe {
+    width: 500px;
+    height: 500px;
+    background: var(--backgroundDark);
+    border-radius: 50%;
+    transform: scale(0);
+    transform-origin: center center;
+}
+
+#cd {
+    font-size: 50px;
+    font-family: "OpenSans-ExtraBold";
+}
+
+.loadingText {
+    font-size: 150px;
+    font-family: "OpenSans-ExtraBold";
+    position: absolute;
+    left: 155px;
+    top: 250px;
+    z-index: 2;
+}
+
+.loading {
+    border: 10px solid var(--backgroundDark);
+    width: 1600px;
+    height: 229px;
+    position: absolute;
+    top: 457px;
+    left: 155px;
+    padding: 10px;
+}
+
+.loadingBlock {
+    box-sizing: border-box;
+    background: var(--backgroundDark);
+    width: 89.5px;
+    height: 100%;
+    display: inline-block;
+    margin-right: 11px;
+}
+
+.loadingFinish {
+    position: absolute;
+    right: 0;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background: var(--backgroundDark);
+    clip-path: inset(0 0 0 100%);
+    transition: 1s all;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    font-family: "OpenSans-ExtraBold";
+    font-size: 70px;
+    text-align: center;
+    z-index: 2;
+}
+
+.loading .loadingBlock:last-child {
+    margin-right: 0px;
+}
+
+.loadingPhrases {
+    position: absolute;
+    top: 737px;
+    left: 155px;
+    font-family: "OpenSans-Bold";
+    font-size: 33px;
+    height: 180px;
+    overflow: hidden;
+    z-index: 2;
+}
+
+.phrase b {
+    font-family: "OpenSans-ExtraBold";
+}

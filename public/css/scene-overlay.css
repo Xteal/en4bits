@@ -1,0 +1,73 @@
+.container {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.overlay {
+    background: linear-gradient(to bottom, rgba(0, 0, 0, .8) 5%, rgba(0, 0, 0, 0) 30%);
+}
+
+.title {
+    position: absolute;
+    left: 50px;
+    top: 50px;
+    width: 400px;
+    height: 100px;
+}
+
+.episode {
+    color: var(--primary);
+    font-family: 'OpenSans-ExtraBold';
+    font-size: 39px;
+    line-height: 1.3;
+    box-sizing: border-box;
+}
+
+.invert .episode {
+    color: var(--background);
+}
+
+.nombre {
+    color: white;
+    font-family: 'OpenSans-Regular';
+    font-size: 25px;
+    line-height: .8;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.invert .nombre {
+    color: var(--grayLight);
+}
+
+.hashtag {
+    position: absolute;
+    top: 50px;
+    right: 50px;
+    text-align: right;
+    font-family: 'OpenSans-ExtraBold';
+    font-size: 49px;
+    color: white;
+}
+
+.invert .hashtag {
+    color: var(--background);
+}
+
+.outline {
+    position: absolute;
+    right: 0;
+    top: -15px;
+    -webkit-text-stroke: 1px white;
+    color: transparent;
+}
+
+.normal {
+    position: absolute;
+    right: 0;
+    top: 0px;
+}

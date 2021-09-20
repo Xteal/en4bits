@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>en4bits - Countdown Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/css/fonts.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" referrerpolicy="no-referrer"
+    />
+    <link href="/css/global.css" rel="stylesheet">
+    <link href="/css/countdownEdit.css" rel="stylesheet">
+    <script src="/js/jquery.js"></script>
+    <script src="/js/socket.io.js"></script>
+
+    <script>
+        let delayToSave;
+        $.getJSON("/api/config.json", function(config) {
+            var socket = io.connect(config.domain);
+            socket.on('editedL3', function(data) {
+                console.log(data.l3.id)
+                let container = $(".l3[data-id='" + data.l3.id + "']");
+                container.find(".title").val(data.l3.title);
+                container.find(".subtitle").val(data.l3.subtitle);
+                container.find(".preview").html(data.l3.title.substring(0, 55) + "...")
+            });
+
+            $.getJSON("/api/loadPhrases.json", function(phrases) {
+                for (let [phraseKey, phrase] of Object.entries(phrases.phrases)) {
+                    $(".l3Container").append(`<div class='l3'>
+                                                <div class="lineHead">
+                                                    <div class="preview">
+                                                        <input type='text' name='line' class='line' value='${phrase}'>
+                                                    </div>
+                                                    <div class="quickPlay"><i class="fas fa-trash"></i>
+                                                </div>
+                                                </div>
+                                            </div>`)
+                }
+            })
+
+            $(document).ready(function() {
+                $('body').on('click', '.newSummary', function(e, elem) {
+                    e.preventDefault();
+                    $(".l3Container").append(`<div class='l3'>
+                                                <div class="lineHead">
+                                                    <div class="preview">
+                                                        <input type='text' name='line' class='line' value=''>
+                                                    </div>
+                                                    <div class="quickPlay"><i class="fas fa-trash"></i>
+                                                </div>
+                                                </div>
+                                            </div>`)
+                })
+                $('body').on('click', '.resetCountdown', function(e, elem) {
+                    fetch(config.domain + '/request/countdown/reset/')
+                })
+                $('body').on('click', '.startCountdown', function(e, elem) {
+                    fetch(config.domain + '/request/countdown/start/')
+                })
+                $('body').on('click', '.startBumper', function(e, elem) {
+                    fetch(config.domain + '/request/countdown/startBumper/')
+                })
+                $('body').on('click', '.addCountdown', function(e, elem) {
+                    fetch(config.domain + '/request/countdown/add/')
+                })
+                $('body').on('click', '.subtractCountdown', function(e, elem) {
+                    fetch(config.domain + '/request/countdown/subtract/')
+                })
+                $('body').on('click', '.quickPlay', function(e, elem) {
+                    e.preventDefault();
+                    $(this).parent().parent().remove();
+                    savePhrases(config);
+                })
+                $('body').on('input', '.line', function(e, elem) {
+                    clearTimeout(delayToSave);
+                    delayToSave = setTimeout(function() {
+                        savePhrases(config);
+                    }, 2000);
+                })
+                $('body').on('click', '.lineHead .identity', function(e, elem) {
+                    e.preventDefault();
+                    let parent = $(this).parent().parent();
+                    let formFind = parent.find('form');
+                    if (formFind.hasClass("open"))
+                        formFind.removeClass("open");
+                    else
+                        formFind.addClass("open");
+                });
+                $('body').on('click', '.saveCountdown', function(e, elem) {
+                    e.preventDefault();
+                    reasignIds();
+                    let summaries = [];
+                    $(".form").each(function() {
+                        summaries.push({
+                            id: $(this).find("input[name='id']").val(),
+                            title: $(this).find("input[name='title']").val(),
+                            mediaType: $(this).find("select.mediaType").find(":selected").val(),
+                            media: $(this).find("input[name='image']").val()
+                        })
+
+                        $(this).parent().find(".preview").html($(this).find("input[name='title']").val().substring(0, 15) + "...");
+                    })
+
+                    fetch(config.domain + "/request/countdown/edit", {
+                        method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                        mode: 'cors', // no-cors, *cors, same-origin
+                        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                        credentials: 'same-origin', // include, *same-origin, omit
+                        headers: {
+                            'Content-Type': 'application/json'
+                                // 'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        redirect: 'follow', // manual, *follow, error
+                        referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                        body: JSON.stringify(summaries) // body data type must match "Content-Type" header
+                    }).then((data) => {
+                        location.reload();
+                    });
+
+                });
+            });
+        });
+
+        function savePhrases(config) {
+            let phrases = [];
+            $(".line").each(function() {
+                phrases.push($(this).val())
+            })
+
+            fetch(config.domain + "/request/countdown/editPhrases", {
+                method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                mode: 'cors', // no-cors, *cors, same-origin
+                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: 'same-origin', // include, *same-origin, omit
+                headers: {
+                    'Content-Type': 'application/json'
+                        // 'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                redirect: 'follow', // manual, *follow, error
+                referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                body: JSON.stringify(phrases) // body data type must match "Content-Type" header
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="controls">
+            <input type="button" class="addCountdown" value="+1 min.">
+            <input type="button" class="subtractCoutdown" value="-1 min.">
+            <input type="button" class="newSummary" value="NUEVA LINEA">
+            <input type="button" class="saveSummary" value="GUARDAR">
+            <input type="button" class="startCountdown" value="START">
+            <input type="button" class="startBumper" value="START BUMPER">
+            <input type="button" class="resetCountdown" value="RESET">
+        </div>
+        <div class="l3Container">
+        </div>
+    </div>
+
+</body>
+
+</html>

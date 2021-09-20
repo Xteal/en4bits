@@ -1,0 +1,60 @@
+.l3 {
+    position: absolute;
+    left: 39px;
+    bottom: 35px;
+    height: 180px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    transition: all 1s;
+    clip-path: inset(0 100% 0 0);
+    background: var(--primary);
+    max-width: 1200px;
+}
+
+.text {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 10px 50px;
+}
+
+.text.no-text {
+    padding: 0;
+}
+
+.active {
+    clip-path: inset(0 0 0 0);
+}
+
+.title {
+    font-family: 'OpenSans-ExtraBold';
+    color: var(--background);
+    font-size: 57px;
+    line-height: 1;
+}
+
+.subtitle {
+    font-family: 'OpenSans-Regular';
+    color: var(--grayLight);
+    font-size: 22px;
+    line-height: .9;
+}
+
+.subtitle b {
+    font-family: 'ScoutCond-Bold';
+}
+
+.image {
+    max-width: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+.image img {
+    height: 100%;
+}
+
+.image.with-image {
+    max-width: 100%;
+}

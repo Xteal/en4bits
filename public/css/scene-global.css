@@ -1,0 +1,20 @@
+:root {
+    --primary: #c7f598;
+    --background: #374857;
+    --backgroundDark: #111a21;
+    --greenLight: #cfdfba;
+    --gray: #5b6163;
+    --grayLight: #a2aca2;
+    --grayLightOpacity: rgba(162, 172, 162, .2);
+}
+
+.noise {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 5;
+    background-image: url('/img/noiseBlack.png');
+    mix-blend-mode: difference;
+}

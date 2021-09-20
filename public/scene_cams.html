@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>en4bits - Cam</title>
+    <link href="/css/opensans.css" rel="stylesheet">
+    <link href="/css/scene-global.css" rel="stylesheet">
+    <link href="/css/scene-cams.css" rel="stylesheet">
+    <script src="/js/jquery.js"></script>
+    <script src="/js/socket.io.js"></script>
+    <script>
+        $.getJSON("/api/config.json", function(config) {
+            var socket = io.connect(config.domain);
+            initCams(config);
+
+            socket.on('resetCams', function(data) {
+                console.log("hardRESETAO")
+                initCams(config);
+            });
+            socket.on('editCam', function(data) {
+                if (!data.prop)
+                    $(".cam[data-id=" + data.id + "]").addClass("inactive");
+                else
+                    $(".cam[data-id=" + data.id + "]").removeClass("inactive");
+
+            });
+
+            socket.on('toggleNames', function(data) {
+                if (!data.prop) {
+                    $(".overlay").addClass("inactive");
+                } else {
+                    $(".overlay").removeClass("inactive");
+                }
+            });
+
+            socket.on('editCamInfo', function(data) {
+                if ($(".cam[data-id='" + data.id + "']").find(".overlay").hasClass("inactive")) {
+                    $(".cam[data-id='" + data.id + "']").find(".nick").html(data.prop.nick);
+                    $(".cam[data-id='" + data.id + "']").find(".twitter").html("@" + data.prop.twitter);
+                } else {
+                    $(".cam[data-id='" + data.id + "']").find(".overlay").addClass("inactive");
+                    setTimeout(function() {
+                        $(".cam[data-id='" + data.id + "']").find(".nick").html(data.prop.nick);
+                        $(".cam[data-id='" + data.id + "']").find(".twitter").html("@" + data.prop.twitter);
+                        $(".cam[data-id='" + data.id + "']").find(".overlay").removeClass("inactive");
+                    }, 800)
+                }
+            });
+
+        })
+
+        function initCams(config) {
+            const urlSearchParams = new URLSearchParams(window.location.search);
+            const params = Object.fromEntries(urlSearchParams.entries());
+            $(".camContainer").html("");
+            $.getJSON("/api/cams.json", function(cams) {
+                let activeNames = "";
+                for (let [camKey, cam] of Object.entries(cams.cams)) {
+                    let active = ""
+
+                    if (typeof params.camOnly != "undefined") {
+                        if (params.camOnly == cam.id) {
+                            if (!cam.active)
+                                active = "inactive"
+                            if (!cams.name)
+                                activeNames = "inactive"
+                            if (cam.cam) {
+                                $(".camFull").html(`<div class="full ${active}" data-id="${cam.id}" style="background-image:url('${config.domain}/backgrounds/${cam.id.toLowerCase()}.png')">
+                                                    <div class='overlay ${activeNames}'><div class='nick'>${cam.nick}</div><div class='twitter'>@${cam.twitter}</div></div>
+                                                    <video autoplay="true" playsinline  id="videoElement"></video>
+                                                </div>`)
+                            } else
+                                $(".camFull").html(`<div class="full ${active}" data-id="${cam.id}" style="background-image:url('${config.domain }/backgrounds/${cam.id.toLowerCase()}.png')">
+                                                    <div class='overlay ${activeNames}'><div class='nick'>${cam.nick}</div><div class='twitter'>@${cam.twitter}</div></div>
+                                                    <div class='iframeWrapper'><iframe src="https://obs.ninja/?view=${cam.id}&scene&room=en4bitse3&password=en4bitse3&na&transparent&cover&optimize" muted></iframe></div>
+                                                </div>`)
+                        }
+                    } else {
+                        if (!cam.active)
+                            active = "inactive"
+                        if (!cams.name)
+                            activeNames = "inactive"
+                        if (cam.cam) {
+                            $(".camContainer").append(`<div class="cam ${active}" data-id="${cam.id}" style="background-image:url('${config.domain}/backgrounds/${cam.id.toLowerCase()}.png')">
+                                                    <div class='overlay ${activeNames}'><div class='nick'>${cam.nick}</div><div class='twitter'>@${cam.twitter}</div></div>
+                                                    <video autoplay="true" playsinline  id="videoElement"></video>
+                                                </div>`)
+                        } else
+                            $(".camContainer").append(`<div class="cam ${active}" data-id="${cam.id}" style="background-image:url('${config.domain }/backgrounds/${cam.id.toLowerCase()}.png')">
+                                                    <div class='overlay ${activeNames}'><div class='nick'>${cam.nick}</div><div class='twitter'>@${cam.twitter}</div></div>
+                                                    <div class='iframeWrapper'><iframe src="https://obs.ninja/?view=${cam.id}&scene&room=en4bitse3&password=en4bitse3&na&transparent&cover&optimize" muted></iframe></div>
+                                                </div>`)
+                    }
+                }
+            })
+
+            setTimeout(function() {
+                var video = document.querySelector("#videoElement");
+
+                if (navigator.mediaDevices.getUserMedia) {
+                    navigator.mediaDevices.getUserMedia({
+                            video: {
+                                width: {
+                                    min: 1280
+                                },
+                                height: {
+                                    min: 720
+                                }
+                            }
+                        })
+                        .then(function(stream) {
+                            video.srcObject = stream;
+                        })
+                        .catch(function(err0r) {
+                            console.log("Something went wrong!");
+                        });
+                }
+            }, 2000);
+        }
+    </script>
+</head>
+
+<body>
+    <div class="camContainer">
+    </div>
+    <div class="camFull">
+    </div>
+</body>
+
+</html>

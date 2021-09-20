@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>en4bits - Summary Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/css/fonts.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" referrerpolicy="no-referrer"
+    />
+    <link href="/css/global.css" rel="stylesheet">
+    <link href="/css/summaryEdit.css" rel="stylesheet">
+    <script src="/js/jquery.js"></script>
+    <script src="/js/socket.io.js"></script>
+
+    <script>
+        $.getJSON("/api/config.json", function(config) {
+            var socket = io.connect(config.domain);
+            socket.on('editedL3', function(data) {
+                console.log(data.l3.id)
+                let container = $(".l3[data-id='" + data.l3.id + "']");
+                container.find(".title").val(data.l3.title);
+                container.find(".subtitle").val(data.l3.subtitle);
+                container.find(".preview").html(data.l3.title.substring(0, 55) + "...")
+            });
+
+            socket.on('highlightSummary', function(data) {
+                let activeId = data.id;
+                changeState(activeId)
+            });
+
+            $.getJSON("/api/summary.json", function(summaryData) {
+                let active = summaryData.activeId;
+                if (active)
+                    $(".togglePlay").removeClass("play").addClass("stop").val("STOP")
+                else
+                    $(".togglePlay").removeClass("stop").addClass("play").val("PLAY")
+                let activeId = summaryData.activeId;
+                for (let [summaryKey, summary] of Object.entries(summaryData.summary)) {
+                    let activeClass = "";
+
+                    if (summary.id == activeId && active)
+                        activeClass = "active";
+                    $(".activeId").append(`<option value='${summary.id}' ${activeId==summary.id? "selected" : ""}>${summary.id}</option>`)
+                    $(".l3Container").append(`<div class='l3' data-id="${summary.id}">
+                                                <div class="lineHead">
+                                                    <div class='identity ${activeClass}'>${summary.id}</div><div class='status ${activeClass}'> <div class='dot'></div> <span class='text'>${activeClass!=""? "ACTIVO" : "INACTIVO" }</span></div> <div class="preview">${summary.title.substring(0,55) + "..."}</div><div class="quickPlay ${activeClass!=""? "stop" : "play" }" data-id="${summary.id}"><i class="fas ${activeClass!=""? "fa-stop" : "fa-play" }"></i></div>
+                                                </div>
+                                                <form class="form" action='${config.domain}/editL3' method='post'>
+                                                    <input type='hidden' name='id' value='${summary.id}'>
+                                                    <select class="mediaType">
+                                                        <option value="image" ${summary.mediaType=="image"? "selected": ""}>Imagen</option>
+                                                        <option value="video"${summary.mediaType=="video"? "selected": ""}>Video</option>
+                                                    </select>
+                                                    <input type='text' name='image' class='image' value='${summary.media}'><br>
+                                                    <input type='text' name='title' class='title' value='${summary.title}'><br>
+                                                    <input type="button" class="delete" value="Eliminar">
+                                                </form>
+                                            </div>`)
+                }
+            })
+
+            $(document).ready(function() {
+                $('body').on('click', '.delete', function(e, elem) {
+                    e.preventDefault();
+                    $(this).parent().parent().remove();
+                    reasignIds();
+                })
+                $('body').on('click', '.newSummary', function(e, elem) {
+                    e.preventDefault();
+                    $(".l3Container").append(`<div class='l3' data-id="">
+                                                <div class="lineHead">
+                                                    <div class='identity'></div><div class='status'> <div class='dot'></div> <span class='text'>INACTIVO</span></div> <div class="preview">...</div><div class="quickPlay play" data-id=""><i class="fas fa-stop"></i></div>
+                                                </div>
+                                                <form class="form" method='post'>
+                                                    <input type='hidden' name='id' value=''>
+                                                    <select class="mediaType">
+                                                        <option value="image" selected>Imagen</option>
+                                                        <option value="video">Video</option>
+                                                    </select>
+                                                    <input type='text' name='image' class='image' value=''><br>
+                                                    <input type='text' name='title' class='title' value=''><br>
+                                                    <input type="button" class="delete" value="Eliminar">
+                                                </form>
+                                            </div>`)
+                    reasignIds();
+                })
+                $('body').on('click', '.resetSummary', function(e, elem) {
+                    fetch(config.domain + '/request/summary/reset/')
+                })
+                $('body').on('click', '.quickPlay', function(e, elem) {
+                    let activeId = $(this).data("id")
+                    fetch(config.domain + '/request/summary/highlight/' + activeId)
+                })
+                $('body').on('click', '.lineHead .identity', function(e, elem) {
+                    e.preventDefault();
+                    let parent = $(this).parent().parent();
+                    let formFind = parent.find('form');
+                    if (formFind.hasClass("open"))
+                        formFind.removeClass("open");
+                    else
+                        formFind.addClass("open");
+                });
+                $('body').on('click', '.saveSummary', function(e, elem) {
+                    e.preventDefault();
+                    reasignIds();
+                    let summaries = [];
+                    $(".form").each(function() {
+                        summaries.push({
+                            id: $(this).find("input[name='id']").val(),
+                            title: $(this).find("input[name='title']").val(),
+                            mediaType: $(this).find("select.mediaType").find(":selected").val(),
+                            media: $(this).find("input[name='image']").val()
+                        })
+
+                        $(this).parent().find(".preview").html($(this).find("input[name='title']").val().substring(0, 15) + "...");
+                    })
+
+                    fetch(config.domain + "/request/summary/edit", {
+                        method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                        mode: 'cors', // no-cors, *cors, same-origin
+                        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                        credentials: 'same-origin', // include, *same-origin, omit
+                        headers: {
+                            'Content-Type': 'application/json'
+                                // 'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        redirect: 'follow', // manual, *follow, error
+                        referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                        body: JSON.stringify(summaries) // body data type must match "Content-Type" header
+                    }).then((data) => {
+                        location.reload();
+                    });
+
+                });
+            });
+        });
+
+        function reasignIds() {
+            let count = 1;
+            $(".l3").each(function() {
+                $(this).attr("data-id", count);
+                $(this).find(".identity").html(count);
+                $(this).find("input[name='id']").val(count);
+                count++;
+            });
+        }
+
+        function changeState(id = "") {
+            $(".status, .identity").removeClass("active");
+            $(".status .text").html("INACTIVO")
+            $(".togglePlay").removeClass("stop").addClass("play").val("PLAY")
+
+            $(".togglePlay").removeClass("play").addClass("stop").val("STOP")
+            $(".quickPlay").removeClass("play stop");
+            if (id != "") {
+                $(".l3[data-id='" + id + "'] .status,.l3[data-id='" + id + "']  .identity").addClass("active");
+                $(".l3[data-id='" + id + "'] .status .text").html("ACTIVO")
+                $(".l3[data-id='" + id + "'] .quickPlay").addClass("stop");
+            }
+
+            $(".quickPlay .fas").removeClass("fa-play").addClass("fa-stop");
+
+        }
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="controls">
+            <input type="button" class="newSummary" value="NUEVA LINEA">
+            <input type="button" class="saveSummary" value="GUARDAR">
+            <input type="button" class="resetSummary" value="HARD RESET">
+        </div>
+        <div class="l3Container">
+        </div>
+    </div>
+
+</body>
+
+</html>
